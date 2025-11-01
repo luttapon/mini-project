@@ -66,8 +66,8 @@ const App: React.FC = () => {
     };
     // ---------------------------------------------------------------------
         const handleGoRegister = () => {
-        // ใช้ router.push('/resgister') เพื่อเปลี่ยนเส้นทางไปยังหน้า resgister
-        router.push('/resgister');
+        // ใช้ router.push('/register') เพื่อเปลี่ยนเส้นทางไปยังหน้า register
+        router.push('/register');
     };
     
     const handleGopasswordreset = () => {

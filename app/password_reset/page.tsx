@@ -71,8 +71,8 @@ const App = () => {
     // --- ฟังก์ชันจัดการการเปลี่ยนเส้นทางไปยังหน้าลงทะเบียน ---
     const router = useRouter();
   const handleGoRegister = () => {
-        // ใช้ router.push('/resgister') เพื่อเปลี่ยนเส้นทางไปยังหน้า resgister
-        router.push('/resgister');
+        // ใช้ router.push('/register') เพื่อเปลี่ยนเส้นทางไปยังหน้า register
+        router.push('/register');
     };
 
      // กำหนดแหล่งที่มาของภาพพื้นหลัง 
