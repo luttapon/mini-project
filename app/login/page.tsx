@@ -169,7 +169,7 @@ const App: React.FC = () => {
                         {/* ปุ่มส่ง: เข้าสู่ระบบ */}
                         <button
                             type="submit"
-                            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md shadow-blue-600/30 hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 text-lg"
+                            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md shadow-blue-600/30 hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 text-lg cursor-pointer"
                         >
                             เข้าสู่ระบบ
                         </button>
