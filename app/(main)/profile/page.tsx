@@ -27,7 +27,7 @@ export default function Page() {
     <div className="min-h-screen bg-linear-to-br from-sky-50 via-white to-amber-50 px-4 py-10">
       <div className="mx-auto flex max-w-5xl flex-col gap-6">
         <section className="overflow-hidden rounded-3xl border border-sky-200 bg-white shadow-xl shadow-sky-100">
-          <div className="h-36 w-full bg-linear-to-r from-sky-500 via-sky-500 to-sky-500"/>
+          <div className="h-36 w-full bg-linear-to-r from-sky-400 via-blue-900 to-blue-900"/>
           <div className="px-15 pb-6">
             <div className="-mt-16 flex flex-wrap items-end gap-7">
               <div className="relative h-32 w-32">
