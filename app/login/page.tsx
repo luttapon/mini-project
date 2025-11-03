@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase/client'
 
 // กำหนดโครงสร้างสำหรับสถานะข้อความตอบกลับ
 interface MessageState {
@@ -13,6 +14,7 @@ const App: React.FC = () => {
     // สถานะสำหรับข้อมูลฟอร์ม
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
     
     // สถานะสำหรับกล่องข้อความตอบกลับ
     const [message, setMessage] = useState<MessageState>({ text: '', type: '' });
@@ -38,22 +40,34 @@ const App: React.FC = () => {
      *  
      * @param e เหตุการณ์การส่งฟอร์ม
      */
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        setLoading(true); // เริ่ม Loading
+        setMessage({ text: '', type: '' }); // ล้างข้อความเก่า
 
-        // ฟังก์ชันการตรวจสอบ
-        if (username && password) {
-            
-            console.log('Attempting login with:', { username, password });
-            
-            showMessage('เข้าสู่ระบบสำเร็จ! (แต่ข้อมูลไม่ได้ถูกส่งไปยังเซิร์ฟเวอร์จริง)', 'success');
-            
-            // ล้างฟอร์มหลังจากการส่งที่สำเร็จ 
-            setUsername('');
-            setPassword('');
+        // (โค้ดที่เพิ่มเข้ามา)
+        // เรียก Supabase Auth
+        // เราใช้ 'username' state (ที่ผู้ใช้กรอก) เป็น 'email'
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: username, 
+            password: password,
+        });
 
-        } else {
-            showMessage('กรุณากรอกชื่อผู้ใช้/อีเมล และรหัสผ่านให้ครบถ้วน', 'error');
+        setLoading(false); // หยุด Loading
+
+        if (error) {
+            // ถ้า Supabase ส่ง error กลับมา (เช่น รหัสผิด, ไม่มี user)
+            console.error('Login error:', error.message);
+            showMessage('อีเมลหรือรหัสผ่านไม่ถูกต้อง', 'error');
+        } else if (data.user) {
+            // ถ้าสำเร็จ
+            showMessage('เข้าสู่ระบบสำเร็จ! กำลังไปหน้าหลัก...', 'success');
+            
+            // รอ 1 วินาทีให้ผู้ใช้อ่านข้อความ แล้วค่อย Redirect
+            setTimeout(() => {
+                router.push('/dashboard'); // ไปหน้าหลัก
+                router.refresh(); // (สำคัญ!) สั่งให้ Next.js โหลดข้อมูลใหม่ (ในฐานะ user ที่ login แล้ว)
+            }, 1000);
         }
     };
     
@@ -127,7 +141,7 @@ const App: React.FC = () => {
                         {/* ช่องป้อน: ชื่อผู้ใช้หรืออีเมล */}
                         <div className="mb-5">
                             <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                                ชื่อผู้ใช้ หรือ อีเมล
+                                อีเมล
                             </label>
                             <input
                                 type="text"
@@ -169,9 +183,10 @@ const App: React.FC = () => {
                         {/* ปุ่มส่ง: เข้าสู่ระบบ */}
                         <button
                             type="submit"
+                            disabled={loading || !username || !password}
                             className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md shadow-blue-600/30 hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 text-lg cursor-pointer"
                         >
-                            เข้าสู่ระบบ
+                            {loading ? 'กำลังตรวจสอบ...' : 'เข้าสู่ระบบ'}
                         </button>
                     </form>
 

@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Mail, User, Lock, LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { supabase } from '@/lib/supabase/client' 
 
 // --- Interface สำหรับ Props ของ InputField ---
 interface InputFieldProps {
@@ -11,6 +12,7 @@ interface InputFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; // กำหนดประเภทของฟังก์ชัน onChange
   placeholder: string;
   required?: boolean;
+  id: string;
 }
 
 // --- คอมโพเนนต์ย่อยสำหรับช่องป้อนข้อมูล (Input Field) ---
@@ -43,25 +45,44 @@ const App = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // --- สถานะสำหรับข้อความแสดงผลลัพธ์หรือข้อผิดพลาด ---
   const [message, setMessage] = useState("");
+  // (isFormComplete ถูกตรวจสอบโดย 'disabled' ของปุ่มแล้ว)
 
   // --- ฟังก์ชันจัดการการลงทะเบียน (เมื่อกดปุ่ม) ---
-  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // ป้องกันการรีโหลดหน้าเว็บของฟอร์ม
-
-    // --- Logic การลงทะเบียนจริง
-    // ส่งค่า email, username, password ไปยัง API ที่เซิร์ฟเวอร์
-    console.log("ข้อมูลลงทะเบียน:", { email, username, password });
-
-    // แสดงข้อความว่าลงทะเบียนสำเร็จแล้ว
-    setMessage("✅ ลงทะเบียนสำเร็จแล้ว! (ข้อมูลถูกบันทึกใน Console)");
-
-    // รีเซ็ตฟอร์ม
-    setEmail("");
-    setUsername("");
-    setPassword("");
+    setMessage(""); // ล้างข้อความเก่า
+    setLoading(true); // เริ่ม loading
+    // (isFormComplete ถูกตรวจสอบโดย 'disabled' ของปุ่มแล้ว)
+    const { data, error } = await supabase.auth.signUp({
+        // ส่งอีเมลและรหัสผ่านไปยัง Supabase
+        email: email,
+        password: password,
+        options: {
+            // (สำคัญมาก!) ส่ง 'username' ที่ผู้ใช้กรอก
+            // ไปให้ SQL Trigger (handle_new_user)
+            // โดยมันจะไปเก็บใน auth.users.raw_user_meta_data
+            data: {
+                username: username
+            }
+        }
+    });
+    setLoading(false);
+    if (error) {
+        // ถ้าเกิดข้อผิดพลาด (เช่น อีเมลนี้ถูกใช้แล้ว)
+        setMessage(` ${error.message}`);
+    } else {
+        // ถ้าสำเร็จ
+        setMessage("สำเร็จ! กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยัน");
+        
+        // รีเซ็ตฟอร์ม
+        setEmail("");
+        setUsername("");
+        setPassword("");
+    }
   };
 
   // ตรวจสอบว่าฟอร์มครบถ้วนหรือไม่
@@ -103,7 +124,7 @@ const App = () => {
         {message && (
           <div
             className={`p-3 mb-4 rounded-lg text-sm font-medium ${
-              message.startsWith("✅")
+              message.startsWith("สำเร็จ")
                 ? "bg-green-100 text-green-700"
                 : "bg-red-100 text-red-700"
             }`}
@@ -111,17 +132,17 @@ const App = () => {
             {message}
           </div>
         )}
-
+        <form onSubmit={handleRegister}>
         {/* แบบฟอร์มลงทะเบียน */}
         <label
-          htmlFor="password"
+          htmlFor="email-input"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
           อีเมล
         </label>
-        <form onSubmit={handleRegister}>
           {/* ช่องป้อนอีเมล */}
           <InputField
+            id="email-input"
             icon={Mail}
             type="email"
             value={email}
@@ -131,12 +152,13 @@ const App = () => {
 
           {/* ช่องป้อนชื่อผู้ใช้ (Username) */}
           <label
-            htmlFor="password"
+            htmlFor="username-input"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
             ชื่อผู้ใช้
           </label>
           <InputField
+            id="username-input"
             icon={User}
             type="text"
             value={username}
@@ -153,25 +175,26 @@ const App = () => {
             รหัสผ่าน
           </label>
           <InputField
+            id="password-input"
             icon={Lock}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="รหัสผ่าน (Password)"
           />
-
+          
           {/* ปุ่มลงทะเบียน */}
           <button
             type="submit"
             // ปุ่มจะใช้งานได้เมื่อทั้งฟอร์มมีข้อมูลครบ
-            disabled={!isFormComplete}
+            disabled={!isFormComplete || loading}
             className={`w-full py-3 rounded-lg text-white font-semibold shadow-lg transition duration-300 ease-in-out ${
-              !isFormComplete
+              !isFormComplete || loading
                 ? "bg-indigo-300 cursor-not-allowed" // สไตล์เมื่อปุ่มถูกปิดใช้งาน
                 : "bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-[1.01] cursor-pointer" // สไตล์เมื่อปุ่มพร้อมใช้งาน
             }`}
           >
-            ลงทะเบียน
+            {loading ? "กำลังลงทะเบียน..." : "ลงทะเบียน"}
           </button>
         </form>
 
@@ -179,7 +202,7 @@ const App = () => {
         <div className="mt-6 text-center text-sm text-gray-500">
           มีบัญชีอยู่แล้ว?
           <a
-            href="#"
+            href="/login"
             className="font-medium text-indigo-600 hover:text-indigo-500"
             onClick={handleGoLogin}
           >
