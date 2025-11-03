@@ -3,10 +3,10 @@ import Image from "next/image";
 
 export const NavbarTop = () => {
   return (
-    <nav className="flex justify-between items-center bg-cyan-400 px-8 py-2 gap-6 fixed top-0 left-0 w-full z-50 h-20">
+    <nav className="flex justify-between items-center bg-gray-900 px-8 py-2 gap-6 fixed top-0 left-0 w-full z-50 h-20">
       <div className="flex-1">
-        <Link href="/dashboard" > 
-          HOME 
+        <Link href="/dashboard" className="text-2xl font-bold text-blue-500 hover:text-white"> 
+          Our Zone 
         </Link>
       </div>
       <div className="flex-1 flex justify-center">
@@ -26,6 +26,7 @@ export const NavbarTop = () => {
         ></input>
       </div>
       <div className="flex-1 flex justify-end items-center gap-6">
+        
         <button
           className="p-2 rounded-full 
             text-yellow-400 
@@ -53,7 +54,7 @@ export const NavbarTop = () => {
       <div className="w-10 h-10 rounded-full overflow-hidden ring-3 ring-yellow-400">
         <Link href="/profile">
           <Image
-            src="/profile-icon.png"
+            src="/profile.jpg"
             alt="Profile Icon"
             width={40}  
             height={40}

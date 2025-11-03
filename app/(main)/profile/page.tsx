@@ -14,7 +14,7 @@ type PostPreview = {
 
 // Ready to be replaced once backend data is available
 const profileData: ProfileData = {
-  avatarSrc: null,
+  avatarSrc: "/profile.jpg",
   name: "tewan",
   description: "คำอธิบาย",
 };
@@ -35,6 +35,7 @@ export default function Page() {
                   <Image
                     src={profileData.avatarSrc}
                     alt="Profile avatar of the AquaSphere community manager"
+
                     fill
                     priority
                     sizes="128px"
