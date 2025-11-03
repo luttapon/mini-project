@@ -2,6 +2,8 @@
 import React, { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle, faFacebookF } from "@fortawesome/free-brands-svg-icons";
 
 // กำหนดโครงสร้างสำหรับสถานะข้อความตอบกลับ
 interface MessageState {
@@ -15,7 +17,7 @@ const App: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
-    
+
     // สถานะสำหรับกล่องข้อความตอบกลับ
     const [message, setMessage] = useState<MessageState>({ text: '', type: '' });
 
@@ -29,13 +31,19 @@ const App: React.FC = () => {
      */
     const showMessage = (text: string, type: 'success' | 'error') => {
         setMessage({ text, type });
-        
+
         // ซ่อนข้อความโดยอัตโนมัติหลังจาก 5 วินาที
         setTimeout(() => {
             setMessage({ text: '', type: '' });
         }, 5000);
     };
+    const handleGoogleSignIn = (): void => {
+        console.log('Google Sign-In Clicked - Initiating OAuth flow...');
+    };
 
+    const handleFacebookSignIn = (): void => {
+        console.log('Facebook Sign-In Clicked - Initiating OAuth flow...');
+    };
     /**
      *  
      * @param e เหตุการณ์การส่งฟอร์ม
@@ -49,7 +57,7 @@ const App: React.FC = () => {
         // เรียก Supabase Auth
         // เราใช้ 'username' state (ที่ผู้ใช้กรอก) เป็น 'email'
         const { data, error } = await supabase.auth.signInWithPassword({
-            email: username, 
+            email: username,
             password: password,
         });
 
@@ -62,7 +70,7 @@ const App: React.FC = () => {
         } else if (data.user) {
             // ถ้าสำเร็จ
             showMessage('เข้าสู่ระบบสำเร็จ! กำลังไปหน้าหลัก...', 'success');
-            
+
             // รอ 1 วินาทีให้ผู้ใช้อ่านข้อความ แล้วค่อย Redirect
             setTimeout(() => {
                 router.push('/dashboard'); // ไปหน้าหลัก
@@ -70,7 +78,7 @@ const App: React.FC = () => {
             }, 1000);
         }
     };
-    
+
     /**
      * ฟังก์ชันสําหรับปุ่มย้อนกลับ (กลับไปยังหน้าหลัก)
      */
@@ -79,11 +87,11 @@ const App: React.FC = () => {
         router.push('/');
     };
     // ---------------------------------------------------------------------
-        const handleGoRegister = () => {
+    const handleGoRegister = () => {
         // ใช้ router.push('/register') เพื่อเปลี่ยนเส้นทางไปยังหน้า register
         router.push('/register');
     };
-    
+
     const handleGopasswordreset = () => {
         // ใช้ router.push('/password_reset') เพื่อเปลี่ยนเส้นทางไปยังหน้า password_reset
         router.push('/password_reset');
@@ -97,12 +105,12 @@ const App: React.FC = () => {
     // กำหนดแหล่งที่มาของภาพพื้นหลัง 
     const imagePathFromPublic = '/bglogin.png'; // ใช้ภาพจากโฟลเดอร์ public
     const backgroundImageSource = imagePathFromPublic;
-    
+
     // ---------------------------------------------------------------------
 
     return (
         // คอนเทนเนอร์หลักที่มีพื้นหลังเป็นรูปภาพ
-        <div 
+        <div
             className="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-cover bg-center"
             style={{ backgroundImage: `url(${backgroundImageSource})`, fontFamily: 'Inter, sans-serif' }}
         >
@@ -110,8 +118,8 @@ const App: React.FC = () => {
             <div className="absolute inset-0 bg-black opacity-40"></div>
 
             {/* คอนเทนเนอร์การ์ดเข้าสู่ระบบ */}
-            <div className="w-full max-w-md relative z-10"> 
-                
+            <div className="w-full max-w-md relative z-10">
+
                 {/* ปุ่มย้อนกลับ (Back Button) */}
                 <button
                     onClick={handleGoBack}
@@ -189,11 +197,35 @@ const App: React.FC = () => {
                             {loading ? 'กำลังตรวจสอบ...' : 'เข้าสู่ระบบ'}
                         </button>
                     </form>
+                    {/* ตัวแบ่งแนวนอน */}
+                    <div className="flex items-center my-6">
+                        <hr className="flex-grow border-t border-gray-300" aria-hidden="true" />
+                        <span className="mx-4 text-gray-500">หรือ</span>
+                        <hr className="flex-grow border-t border-gray-300" aria-hidden="true" />
+                    </div>
+                    {/* ปุ่มสำหรับ Social Sign-In  */}
+                    <div className="space-y-3 mb-6">
+                        <button
+                            onClick={handleGoogleSignIn}
+                            className="w-full flex items-center justify-center py-2.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out transform hover:scale-[1.005] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            <FontAwesomeIcon icon={faGoogle} className="w-5 h-5 mr-3 text-red-500" />
+                            เข้าสู่ระบบด้วย Google
+                        </button>
+
+                        <button
+                            onClick={handleFacebookSignIn}
+                            className="w-full flex items-center justify-center py-2.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition duration-150 ease-in-out transform hover:scale-[1.005] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            <FontAwesomeIcon icon={faFacebookF} className="w-5 h-5 mr-3" />
+                            เข้าสู่ระบบด้วย Facebook
+                        </button>
+                    </div>
 
                     {/* กล่องข้อความสำหรับข้อเสนอแนะ */}
                     {message.text && (
-                        <div 
-                            id="messageBox" 
+                        <div
+                            id="messageBox"
                             className={`mt-6 p-4 text-sm text-center rounded-lg transition-opacity duration-300 ${messageClasses}`}
                         >
                             {message.text}

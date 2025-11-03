@@ -2,7 +2,9 @@
 import React, { useState } from "react";
 import { Mail, User, Lock, LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { supabase } from '@/lib/supabase/client' 
+import { supabase } from '@/lib/supabase/client'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle , faFacebookF} from "@fortawesome/free-brands-svg-icons";
 
 // --- Interface สำหรับ Props ของ InputField ---
 interface InputFieldProps {
@@ -58,32 +60,41 @@ const App = () => {
     setLoading(true); // เริ่ม loading
     // (isFormComplete ถูกตรวจสอบโดย 'disabled' ของปุ่มแล้ว)
     const { data, error } = await supabase.auth.signUp({
-        // ส่งอีเมลและรหัสผ่านไปยัง Supabase
-        email: email,
-        password: password,
-        options: {
-            // (สำคัญมาก!) ส่ง 'username' ที่ผู้ใช้กรอก
-            // ไปให้ SQL Trigger (handle_new_user)
-            // โดยมันจะไปเก็บใน auth.users.raw_user_meta_data
-            data: {
-                username: username
-            }
+      // ส่งอีเมลและรหัสผ่านไปยัง Supabase
+      email: email,
+      password: password,
+      options: {
+        // (สำคัญมาก!) ส่ง 'username' ที่ผู้ใช้กรอก
+        // ไปให้ SQL Trigger (handle_new_user)
+        // โดยมันจะไปเก็บใน auth.users.raw_user_meta_data
+        data: {
+          username: username
         }
+      }
     });
     setLoading(false);
     if (error) {
-        // ถ้าเกิดข้อผิดพลาด (เช่น อีเมลนี้ถูกใช้แล้ว)
-        setMessage(` ${error.message}`);
+      // ถ้าเกิดข้อผิดพลาด (เช่น อีเมลนี้ถูกใช้แล้ว)
+      setMessage(` ${error.message}`);
     } else {
-        // ถ้าสำเร็จ
-        setMessage("สำเร็จ! กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยัน");
-        
-        // รีเซ็ตฟอร์ม
-        setEmail("");
-        setUsername("");
-        setPassword("");
+      // ถ้าสำเร็จ
+      setMessage("สำเร็จ! กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยัน");
+
+      // รีเซ็ตฟอร์ม
+      setEmail("");
+      setUsername("");
+      setPassword("");
     }
   };
+
+   const handleGoogleSignIn = (): void => {
+        console.log('Google Sign-In Clicked - Initiating OAuth flow...');
+    };
+
+    const handleFacebookSignIn = (): void => {
+        console.log('Facebook Sign-In Clicked - Initiating OAuth flow...');
+    };
+    
 
   // ตรวจสอบว่าฟอร์มครบถ้วนหรือไม่
   const isFormComplete = email && username && password;
@@ -98,7 +109,7 @@ const App = () => {
   const imagePathFromPublic = "/homepage.png"; // ใช้ภาพจากโฟลเดอร์ public
   const backgroundImageSource = imagePathFromPublic;
 
-  
+
 
   return (
     // คอนเทนเนอร์หลัก:
@@ -123,23 +134,22 @@ const App = () => {
         {/* แสดงข้อความสถานะ/แจ้งเตือน */}
         {message && (
           <div
-            className={`p-3 mb-4 rounded-lg text-sm font-medium ${
-              message.startsWith("สำเร็จ")
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }`}
+            className={`p-3 mb-4 rounded-lg text-sm font-medium ${message.startsWith("สำเร็จ")
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
+              }`}
           >
             {message}
           </div>
         )}
         <form onSubmit={handleRegister}>
-        {/* แบบฟอร์มลงทะเบียน */}
-        <label
-          htmlFor="email-input"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          อีเมล
-        </label>
+          {/* แบบฟอร์มลงทะเบียน */}
+          <label
+            htmlFor="email-input"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            อีเมล
+          </label>
           {/* ช่องป้อนอีเมล */}
           <InputField
             id="email-input"
@@ -182,21 +192,45 @@ const App = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="รหัสผ่าน (Password)"
           />
-          
+
           {/* ปุ่มลงทะเบียน */}
           <button
             type="submit"
             // ปุ่มจะใช้งานได้เมื่อทั้งฟอร์มมีข้อมูลครบ
             disabled={!isFormComplete || loading}
-            className={`w-full py-3 rounded-lg text-white font-semibold shadow-lg transition duration-300 ease-in-out ${
-              !isFormComplete || loading
-                ? "bg-indigo-300 cursor-not-allowed" // สไตล์เมื่อปุ่มถูกปิดใช้งาน
-                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-[1.01] cursor-pointer" // สไตล์เมื่อปุ่มพร้อมใช้งาน
-            }`}
+            className={`w-full py-3 rounded-lg text-white font-semibold shadow-lg transition duration-300 ease-in-out ${!isFormComplete || loading
+              ? "bg-indigo-300 cursor-not-allowed" // สไตล์เมื่อปุ่มถูกปิดใช้งาน
+              : "bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-[1.01] cursor-pointer" // สไตล์เมื่อปุ่มพร้อมใช้งาน
+              }`}
           >
             {loading ? "กำลังลงทะเบียน..." : "ลงทะเบียน"}
           </button>
         </form>
+        {/* ตัวแบ่งแนวนอน */}
+        <div className="flex items-center my-6">
+          <hr className="flex-grow border-t border-gray-300" aria-hidden="true" />
+          <span className="mx-4 text-gray-500">หรือ</span>
+          <hr className="flex-grow border-t border-gray-300" aria-hidden="true" />
+        </div>
+
+        {/* ปุ่มสำหรับ Social Sign-In  */}
+        <div className="space-y-3 mb-6">
+          <button
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center py-2.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out transform hover:scale-[1.005] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <FontAwesomeIcon icon={faGoogle} className="w-5 h-5 mr-3 text-red-500" />
+            เข้าสู่ระบบด้วย Google
+          </button>
+
+          <button
+            onClick={handleFacebookSignIn}
+            className="w-full flex items-center justify-center py-2.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition duration-150 ease-in-out transform hover:scale-[1.005] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <FontAwesomeIcon icon={faFacebookF} className="w-5 h-5 mr-3" />
+            เข้าสู่ระบบด้วย Facebook
+          </button>
+        </div>
 
         {/* ไปหน้าเข้าสู่ระบบ */}
         <div className="mt-6 text-center text-sm text-gray-500">
