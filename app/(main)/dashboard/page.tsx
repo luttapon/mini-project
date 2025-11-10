@@ -1,49 +1,204 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Home, Users, Bell, Menu, UserPlus } from 'lucide-react';
+import { Home, Users, Bell, Menu, UserPlus, Send, ThumbsUp, MessageCircle, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+
+// Mock useRouter
 const useRouter = () => ({
   push: (path: string) => console.log(`Navigating to: ${path}`),
 });
 
-
 // กำหนดประเภทของแท็บที่ใช้ในการนำทาง
 type Tab = 'Home' | 'Friends' | 'Notifications' | 'Settings';
 
+// กำหนดประเภทของข้อมูลโพสต์
+interface Post {
+  id: number;
+  author: string;
+  authorInitial: string;
+  authorColor: string;
+  content: string;
+  time: string;
+  likes: number;
+  comments: number;
+  isLiked: boolean;
+}
+
 // --- 1. Main Content Components (เนื้อหาหลักตามแท็บที่เลือก) ---
 
-//ตัวอย่างคอมโพเนนต์สำหรับแต่ละแท็บ
-const HomeFeed: React.FC = () => (
-  <div className="space-y-4 p-4 md:p-6 bg-white rounded-xl shadow-lg">
-    <h2 className="text-2xl font-semibold text-gray-800 border-b pb-2">ฟีด (Feed)</h2>
-    <p className="text-gray-500">ที่นี่คือส่วนของโพสต์และกิจกรรมต่างๆ ที่คุณติดตาม</p>
-
-    {/* Mock Post 1 (โพสต์จำลอง 1) */}
-    <div className="bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
-      <div className="flex items-center space-x-3 mb-3">
-        <div className="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold text-sm">A</div>
-        <div className="font-semibold text-gray-900">Andy W.</div>
-      </div>
-      <p className="text-gray-700">ยินดีต้อนรับสู่ Our Zone! แพลตฟอร์มใหม่ที่น่าตื่นเต้นนี้ดูดีมากๆ เลยครับ ใครมีไอเดียกิจกรรมสนุกๆ มาแชร์กันบ้างครับ? #OurZoneCommunity</p>
-      <div className="flex justify-end text-sm text-gray-400 mt-2">
-        <span>เมื่อ 5 นาทีที่แล้ว</span>
-      </div>
-    </div>
-
-    {/* Mock Post 2 (โพสต์จำลอง 2) */}
-    <div className="bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
-      <div className="flex items-center space-x-3 mb-3">
-        <div className="w-10 h-10 bg-pink-400 rounded-full flex items-center justify-center text-white font-bold text-sm">B</div>
-        <div className="font-semibold text-gray-900">Beth C.</div>
-      </div>
-      <p className="text-gray-700">ฉันกำลังมองหาเพื่อนร่วมทีมสำหรับโปรเจกต์ด้าน Web Development ใครสนใจบ้างคะ? ติดต่อมาได้เลย! 💻</p>
-      <div className="flex justify-end text-sm text-gray-400 mt-2">
-        <span>เมื่อ 2 ชั่วโมงที่แล้ว</span>
-      </div>
-    </div>
-  </div>
+/**
+ * คอมโพเนนต์สำหรับการแสดงปุ่ม Like, Comment, Share
+ */
+const PostAction: React.FC<{ icon: React.ElementType, count: number, label: string, onClick: () => void, isActive?: boolean }> = ({ icon: Icon, count, label, onClick, isActive = false }) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center space-x-1 py-2 px-3 rounded-full transition duration-150 text-sm ${isActive ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-500 hover:bg-gray-100'}`}
+    aria-label={label}
+  >
+    <Icon size={18} />
+    <span>{count}</span>
+    <span className="hidden sm:inline-block">{label}</span>
+  </button>
 );
+
+/**
+ * คอมโพเนนต์สำหรับฟอร์มสร้างโพสต์ใหม่
+ */
+const CreatePostForm: React.FC<{ onPostSubmit: (content: string) => void }> = ({ onPostSubmit }) => {
+  const [postContent, setPostContent] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (postContent.trim()) {
+      onPostSubmit(postContent.trim());
+      setPostContent(''); // ล้างเนื้อหาหลังโพสต์
+    }
+  };
+
+  return (
+    <div className="bg-white p-4 rounded-xl shadow-lg border border-blue-200 mb-6">
+      <h3 className="text-xl font-semibold text-gray-800 mb-3">สร้างโพสต์ใหม่ 📝</h3>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <textarea
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 resize-none"
+          rows={4}
+          placeholder="คุณกำลังคิดอะไรอยู่? แชร์ให้เพื่อนๆ ของคุณรู้สิ..."
+          value={postContent}
+          onChange={(e) => setPostContent(e.target.value)}
+          required
+        />
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={!postContent.trim()}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded-full transition duration-150 disabled:bg-blue-300 flex items-center"
+          >
+            <Send size={18} className="mr-2" />
+            โพสต์
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+//ตัวอย่างคอมโพเนนต์สำหรับแต่ละแท็บ
+const HomeFeed: React.FC = () => {
+  // State สำหรับจัดการรายการโพสต์
+  const [posts, setPosts] = useState<Post[]>([
+    {
+      id: 1,
+      author: "Andy W.",
+      authorInitial: "A",
+      authorColor: "bg-blue-400",
+      content: "ยินดีต้อนรับสู่ Our Zone! แพลตฟอร์มใหม่ที่น่าตื่นเต้นนี้ดูดีมากๆ เลยครับ ใครมีไอเดียกิจกรรมสนุกๆ มาแชร์กันบ้างครับ? #OurZoneCommunity",
+      time: "เมื่อ 5 นาทีที่แล้ว",
+      likes: 12,
+      comments: 5,
+      isLiked: false,
+    },
+    {
+      id: 2,
+      author: "Beth C.",
+      authorInitial: "B",
+      authorColor: "bg-pink-400",
+      content: "ฉันกำลังมองหาเพื่อนร่วมทีมสำหรับโปรเจกต์ด้าน Web Development ใครสนใจบ้างคะ? ติดต่อมาได้เลย! 💻",
+      time: "เมื่อ 2 ชั่วโมงที่แล้ว",
+      likes: 25,
+      comments: 10,
+      isLiked: true,
+    },
+  ]);
+
+  // ฟังก์ชันสำหรับเพิ่มโพสต์ใหม่
+  const handleNewPost = (content: string) => {
+    const newPost: Post = {
+      id: Date.now(), // ใช้ timestamp เป็น ID
+      author: "คุณ (User)", // ผู้ใช้ที่โพสต์
+      authorInitial: "U",
+      authorColor: "bg-green-500",
+      content: content,
+      time: "เมื่อสักครู่",
+      likes: 0,
+      comments: 0,
+      isLiked: false,
+    };
+    // เพิ่มโพสต์ใหม่ไว้ด้านบนสุดของรายการ
+    setPosts([newPost, ...posts]);
+    console.log("โพสต์ใหม่ถูกสร้าง:", content);
+    alert("โพสต์ของคุณถูกสร้างแล้ว! (จำลอง)");
+  };
+
+  // ฟังก์ชันสำหรับจัดการการกดไลก์
+  const handleLikeToggle = (postId: number) => {
+    setPosts(posts.map(post => {
+      if (post.id === postId) {
+        const newLikes = post.isLiked ? post.likes - 1 : post.likes + 1;
+        return {
+          ...post,
+          likes: newLikes,
+          isLiked: !post.isLiked
+        };
+      }
+      return post;
+    }));
+  };
+
+  return (
+    <div className="space-y-4 p-4 md:p-6 bg-white rounded-xl shadow-lg">
+      <h2 className="text-2xl font-semibold text-gray-800 border-b pb-2">หน้าหลักและฟีด (Home Feed)</h2>
+
+      {/* เพิ่มฟอร์มสร้างโพสต์ */}
+      <CreatePostForm onPostSubmit={handleNewPost} />
+      
+      {/* ส่วนแสดงโพสต์ */}
+      <div className="space-y-4">
+        {posts.map((post) => (
+          <div key={post.id} className="bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
+            {/* Header: Author Info */}
+            <div className="flex items-center space-x-3 mb-3 border-b pb-2">
+              <div className={`w-10 h-10 ${post.authorColor} rounded-full flex items-center justify-center text-white font-bold text-sm`}>{post.authorInitial}</div>
+              <div>
+                <div className="font-semibold text-gray-900">{post.author}</div>
+                <div className="text-xs text-gray-400">{post.time}</div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <p className="text-gray-700 mb-4">{post.content}</p>
+
+            {/* Actions (Like, Comment, Share) */}
+            <div className="flex justify-around border-t pt-2">
+              <PostAction
+                icon={ThumbsUp}
+                count={post.likes}
+                label="ไลก์"
+                onClick={() => handleLikeToggle(post.id)}
+                isActive={post.isLiked}
+              />
+              <PostAction
+                icon={MessageCircle}
+                count={post.comments}
+                label="คอมเมนต์"
+                // ฟังก์ชันจำลอง: แค่แสดง Alert เมื่อกด
+                onClick={() => alert(`คุณต้องการคอมเมนต์ในโพสต์ของ ${post.author} ใช่หรือไม่?`)}
+              />
+              <PostAction
+                icon={Share2}
+                count={0}
+                label="แชร์"
+                // ฟังก์ชันจำลอง: แค่แสดง Alert เมื่อกด
+                onClick={() => alert("กำลังแชร์โพสต์... (จำลอง)")}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 
 const FriendsPage: React.FC = () => (
   <div className="p-4 md:p-6 bg-white rounded-xl shadow-lg">
@@ -204,15 +359,15 @@ const App: React.FC = () => {
 
           {/* TOP: Logo and Name (ส่วนหัวของ Sidebar) */}
           <div className="flex items-center justify-center md:justify-start px-4 h-16 border-b border-gray-100 flex-shrink-0">
-            {/* <!-- Placeholder: โลโก้เว็บ --> */}
-            <div className="w-10  h-10 rounded-full flex items-center justify-center text-whi font-extrabold ">
+            {/* */}
+            <div className="w-10  h-10 rounded-full flex items-center justify-center text-whi font-extrabold ">
               <Link href="/dashboard">
                 <Image src="/logo.jpg" alt="Profile Icon" width={60} height={60} />
               </Link>
             </div>
 
             <h1 className="text-2xl text-gray-800 ml-3 hidden md:block" style={logoStyle} >
-              <Link href="/dashboard">  Our Zone </Link>
+              <Link href="/dashboard">  Our Zone </Link>
             </h1>
           </div>
 
