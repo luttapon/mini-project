@@ -256,19 +256,12 @@ const App = () => {
           <div className="space-y-3 mb-6">
             <button
               onClick={handleGoogleSignIn}
-              className="w-full flex items-center justify-center py-2.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out transform hover:scale-[1.005] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="w-full flex items-center justify-center py-2.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out transform hover:scale-[1.005] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
             >
               <FontAwesomeIcon icon={faGoogle} className="w-5 h-5 mr-3 text-red-500" />
               เข้าสู่ระบบด้วย Google
             </button>
 
-            <button
-              onClick={handleFacebookSignIn}
-              className="w-full flex items-center justify-center py-2.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition duration-150 ease-in-out transform hover:scale-[1.005] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              <FontAwesomeIcon icon={faFacebookF} className="w-5 h-5 mr-3" />
-              เข้าสู่ระบบด้วย Facebook
-            </button>
           </div>
 
 

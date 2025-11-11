@@ -1,6 +1,5 @@
 
 import { NavbarTop } from "@/app/components/NavbarTop";
-import { NavbarSub } from "@/app/components/NavbarSub";
 
 export default function MainLayout({
   children,
@@ -10,9 +9,8 @@ export default function MainLayout({
   return (
         <>
           <NavbarTop />
-          <NavbarSub />
           {/* <main> tag นี้ควรจะห่อหุ้ม {children} */}
-          <main className="min-h-screen pt-30">
+          <main className="min-h-screen pt-25">
             {children}
           </main>
        </>

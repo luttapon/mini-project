@@ -354,7 +354,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 font-inter">
       {/* SIDEBAR (แถบเมนูหลักด้านซ้าย: แถบนำทางหลัก) */}
-      <header className="fixed left-0 top-37 h-full w-16 md:w-64 bg-white shadow-xl z-20 transition-all duration-300 border-r border-gray-200">
+      <header className="fixed left-0 top-20 h-full w-16 md:w-64 bg-white shadow-xl z-20 transition-all duration-300 border-r border-gray-200">
         <div className="flex flex-col h-full">
 
           {/* TOP: Logo and Name (ส่วนหัวของ Sidebar) */}
