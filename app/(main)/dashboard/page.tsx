@@ -1,246 +1,347 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { Home, Users, Bell, Menu, UserPlus } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-const useRouter = () => ({
-  push: (path: string) => console.log(`Navigating to: ${path}`),
-});
 
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { Loader2, Heart, MessageSquare } from "lucide-react"; // ลบ LogOut ออก
+import DashboardCommentModal from "@/app/components/DashboardCommentModal"; 
 
-// กำหนดประเภทของแท็บที่ใช้ในการนำทาง
-type Tab = 'Home' | 'Friends' | 'Notifications' | 'Settings';
+// ------------------ Types ------------------
 
-// --- 1. Main Content Components (เนื้อหาหลักตามแท็บที่เลือก) ---
+interface FollowedGroup {
+  group_id: string;
+}
 
-//ตัวอย่างคอมโพเนนต์สำหรับแต่ละแท็บ
-const HomeFeed: React.FC = () => (
-  <div className="space-y-4 p-4 md:p-6 bg-white rounded-xl shadow-lg">
-    <h2 className="text-2xl font-semibold text-gray-800 border-b pb-2">ฟีด (Feed)</h2>
-    <p className="text-gray-500">ที่นี่คือส่วนของโพสต์และกิจกรรมต่างๆ ที่คุณติดตาม</p>
+interface OwnedGroup {
+  id: string;
+}
 
-    {/* Mock Post 1 (โพสต์จำลอง 1) */}
-    <div className="bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
-      <div className="flex items-center space-x-3 mb-3">
-        <div className="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold text-sm">A</div>
-        <div className="font-semibold text-gray-900">Andy W.</div>
-      </div>
-      <p className="text-gray-700">ยินดีต้อนรับสู่ Our Zone! แพลตฟอร์มใหม่ที่น่าตื่นเต้นนี้ดูดีมากๆ เลยครับ ใครมีไอเดียกิจกรรมสนุกๆ มาแชร์กันบ้างครับ? #OurZoneCommunity</p>
-      <div className="flex justify-end text-sm text-gray-400 mt-2">
-        <span>เมื่อ 5 นาทีที่แล้ว</span>
-      </div>
-    </div>
-
-    {/* Mock Post 2 (โพสต์จำลอง 2) */}
-    <div className="bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
-      <div className="flex items-center space-x-3 mb-3">
-        <div className="w-10 h-10 bg-pink-400 rounded-full flex items-center justify-center text-white font-bold text-sm">B</div>
-        <div className="font-semibold text-gray-900">Beth C.</div>
-      </div>
-      <p className="text-gray-700">ฉันกำลังมองหาเพื่อนร่วมทีมสำหรับโปรเจกต์ด้าน Web Development ใครสนใจบ้างคะ? ติดต่อมาได้เลย! 💻</p>
-      <div className="flex justify-end text-sm text-gray-400 mt-2">
-        <span>เมื่อ 2 ชั่วโมงที่แล้ว</span>
-      </div>
-    </div>
-  </div>
-);
-
-const FriendsPage: React.FC = () => (
-  <div className="p-4 md:p-6 bg-white rounded-xl shadow-lg">
-    <h2 className="text-2xl font-semibold text-gray-800 border-b pb-2 mb-4">ค้นหาและเพิ่มเพื่อน (Add Friends)</h2>
-    <p className="text-gray-600 mb-6">คุณสามารถเพิ่มเพื่อนเพื่อติดตามกิจกรรมของพวกเขาได้</p>
-
-    {/* รายการเพื่อนจำลอง */}
-    <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-200 space-y-3">
-      {[
-        { name: "John S.", mutual: 5 },
-        { name: "Lisa M.", mutual: 2 },
-        { name: "Mark K.", mutual: 0 },
-      ].map((user, index) => (
-        <div key={index} className="flex items-center justify-between p-2 border-b last:border-b-0">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-800 font-bold">U</div>
-            <div>
-              <div className="font-medium">{user.name}</div>
-              <div className="text-sm text-gray-500">{user.mutual > 0 ? `${user.mutual} เพื่อนร่วมกัน` : 'ไม่มีเพื่อนร่วมกัน'}</div>
-            </div>
-          </div>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded-full text-sm transition duration-150 flex items-center">
-            <UserPlus size={16} className="mr-1" />
-            เพิ่ม
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-
-const NotificationsPage: React.FC = () => (
-  <div className="p-4 md:p-6 bg-white rounded-xl shadow-lg">
-    <h2 className="text-2xl font-semibold text-gray-800 border-b pb-2 mb-4">แจ้งเตือน (Notifications)</h2>
-    <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-200 space-y-2">
-      {/* รายการแจ้งเตือนจำลอง */}
-      <NotificationItem text="Andy W. ได้แสดงความรู้สึกต่อโพสต์ของคุณ" time="1 นาทีที่แล้ว" isNew={true} />
-      <NotificationItem text="Mark K. ได้ตอบกลับความคิดเห็นของคุณ" time="30 นาทีที่แล้ว" isNew={true} />
-      <NotificationItem text="มีผู้ติดตามคุณ 2 คนใหม่" time="1 วันที่แล้ว" isNew={false} />
-    </div>
-  </div>
-);
-
-// คอมโพเนนต์สำหรับแสดงรายการแจ้งเตือนแต่ละรายการ
-const NotificationItem: React.FC<{ text: string, time: string, isNew: boolean }> = ({ text, time, isNew }) => (
-  <div className={`flex items-start p-3 rounded-lg transition duration-150 ${isNew ? 'bg-blue-50 hover:bg-blue-100 border-l-4 border-blue-500' : 'hover:bg-gray-50'}`}>
-    {/* จุดสีแดงแสดงว่าเป็นการแจ้งเตือนใหม่ */}
-    {isNew && <span className="w-2 h-2 rounded-full bg-red-500 mr-3 mt-1 flex-shrink-0"></span>}
-    <div className="flex-1">
-      <p className={`text-gray-800 ${isNew ? 'font-medium' : 'font-normal'}`}>{text}</p>
-      <p className="text-xs text-gray-500 mt-0.5">{time}</p>
-    </div>
-  </div>
-);
-
-const SettingsPage: React.FC = () => (
-  <div className="p-4 md:p-6 bg-white rounded-xl shadow-lg">
-    <h2 className="text-2xl font-semibold text-gray-800 border-b pb-2 mb-4">เมนูและตั้งค่า (Menu & Settings)</h2>
-    {/* รายการตั้งค่าจำลอง */}
-    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 space-y-4">
-      <MenuItem icon="Profile" title="ข้อมูลส่วนตัว" description="จัดการข้อมูลโปรไฟล์ของคุณ" />
-      <MenuItem icon="Security" title="ความปลอดภัยและความเป็นส่วนตัว" description="ตั้งค่ารหัสผ่านและสิทธิ์การเข้าถึง" />
-      <MenuItem icon="Help" title="ช่วยเหลือและสนับสนุน" description="ติดต่อทีมงานหรือค้นหาคำถามที่พบบ่อย" />
-    </div>
-  </div>
-);
-
-// คอมโพเนนต์สำหรับแสดงรายการเมนูย่อยในการตั้งค่า
-const MenuItem: React.FC<{ icon: string, title: string, description: string }> = ({ title, description }) => (
-  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer border">
-    <div>
-      <div className="font-medium text-gray-800">{title}</div>
-      <div className="text-sm text-gray-500">{description}</div>
-    </div>
-    {/* ไอคอนลูกศรชี้ไปทางขวา */}
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
-      <path d="m9 18 6-6-6-6" />
-    </svg>
-  </div>
-);
-
-// คอมโพเนนต์หลักที่เลือกแสดงเนื้อหาตามแท็บที่ถูกเลือก
-const MainContent: React.FC<{ activeTab: Tab }> = ({ activeTab }) => {
-  switch (activeTab) {
-    case 'Home':
-      return <HomeFeed />; // แสดงหน้าฟีดหลัก
-    case 'Friends':
-      return <FriendsPage />; // แสดงหน้าค้นหาเพื่อน
-    case 'Notifications':
-      return <NotificationsPage />; // แสดงหน้าแจ้งเตือน
-    case 'Settings':
-      return <SettingsPage />; // แสดงหน้าตั้งค่าและเมนู
-    default:
-      return <div className="p-4 text-center text-gray-500">เลือกแท็บเพื่อเริ่มต้น</div>;
-  }
+// Helper function to get group avatar URL from path
+const getGroupAvatarUrl = (avatarPath: string | null | undefined) => {
+    const defaultUrl = "https://placehold.co/40x40?text=G";
+    if (!avatarPath) return defaultUrl;
+    if (avatarPath.startsWith("http")) return avatarPath;
+    
+    const { data } = supabase.storage.from("groups").getPublicUrl(avatarPath);
+    return data.publicUrl || defaultUrl;
 };
 
-// --- 2. Navigation Components (แถบนำทาง) ---
+// Interface สำหรับข้อมูลดิบที่ดึงมาจาก Supabase (รวม joins)
+interface PostFromSupabase {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  group_id: string;
+  media_urls: string[] | null;
+  likes: { user_id: string }[] | null;
+  comments: { id: string }[] | null;
+  groups: { name: string, avatar_url: string | null } | null; 
+}
 
-// คอมโพเนนต์สำหรับรายการนำทางใน Sidebar
-const NavIcon: React.FC<{
-  icon: React.ElementType,
-  tab: Tab,
-  activeTab: Tab,
-  onClick: (tab: Tab) => void,
-  label: string
-}> = ({ icon: Icon, tab, activeTab, onClick, label }) => {
-  const isActive = activeTab === tab;
-  // กำหนดคลาสสำหรับสถานะที่ถูกเลือก (Active) หรือไม่ถูกเลือก (Inactive)
-  const activeClasses = isActive
-    ? 'bg-blue-100 text-blue-600 border-l-4 border-blue-600 font-semibold' // Active: พื้นหลังสีฟ้าอ่อนและเส้นขอบซ้ายสีน้ำเงิน
-    : 'text-gray-600 hover:bg-gray-100 hover:text-blue-500'; // Inactive: มีเอฟเฟกต์ Hover
+// Interface สำหรับ State ใน Client (ข้อมูลที่คำนวณแล้ว)
+interface Post {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  group_id: string;
+  media_urls: string[] | null;
+  likesCount: number;
+  commentsCount: number;
+  likedByUser: boolean;
+  group_name: string;
+  group_avatar_url: string; // URL รูปกลุ่ม
+}
 
-  return (
-    <button
-      onClick={() => onClick(tab)}
-      // คลาสพื้นฐาน: เต็มความกว้าง, จัดวางแบบ Flex, จัดกึ่งกลางไอคอนบนมือถือ
-      className={`w-full flex items-center justify-center md:justify-start py-3 px-4 rounded-lg transition duration-200 ${activeClasses} focus:outline-none`}
-      aria-label={label}
-    >
-      <Icon size={24} className="flex-shrink-0" />
-      {/* ป้ายชื่อ (Label) จะซ่อนบนมือถือ (w-16) และแสดงบนเดสก์ท็อป (w-64) */}
-      <span className="text-sm ml-4 hidden md:block">{label}</span>
-    </button>
-  );
-};
+// ------------------ Component ------------------
 
-// --- 3. Main Application Component (คอมโพเนนต์หลักของแอปพลิเคชัน) ---
+export default function DashboardPage() {
+  const router = useRouter();
 
-const App: React.FC = () => {
-  // ตั้งค่า State สำหรับการเปลี่ยนแท็บ
-  const [activeTab, setActiveTab] = useState<Tab>('Home');
-  const router = useRouter(); // Mock router
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activePostIdForComments, setActivePostIdForComments] =
+    useState<string | null>(null);
 
-  // สไตล์สำหรับโลโก้ Our Zone (ใช้ฟอนต์ Pacifico)
-  const logoStyle = {
-    fontFamily: "'Pacifico', cursive",
-    letterSpacing: '0.5px',
+  // --- Helper function to get public URL for post media ---
+  const getPublicMediaUrl = (urlOrPath: string) => {
+    if (!urlOrPath) return "https://placehold.co/128x128?text=No+Image";
+    if (urlOrPath.startsWith("http")) return urlOrPath;
+
+    const { data } = supabase.storage
+      .from("post_media")
+      .getPublicUrl(urlOrPath);
+
+    return data.publicUrl || "https://placehold.co/128x128?text=No+Image";
   };
 
-  // โหลดฟอนต์ Pacifico จาก Google Fonts เมื่อคอมโพเนนต์ถูกเมาท์
-  useEffect(() => {
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Pacifico&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-  }, []);
 
-  // กำหนดความกว้างของ Sidebar ที่ใช้ในการผลักเนื้อหาหลัก (w-16 บนมือถือ, w-64 บนเดสก์ท็อป)
-  const sidebarWidthClass = 'ml-16 md:ml-64';
+  // ------------------ Fetch User (Authentication) ------------------
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+
+      setUser(user as SupabaseUser);
+    };
+
+    getUser();
+  }, [router]);
+
+
+  // ------------------ Fetch Posts (Data Retrieval) ------------------
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchPosts = async () => {
+      try {
+        // 1. ดึง ID กลุ่มที่ User ติดตามและเป็นเจ้าของ
+        const { data: followedGroups } = await supabase.from("group_members").select("group_id").eq("user_id", user.id) as { data: FollowedGroup[] | null };
+        const { data: ownedGroups } = await supabase.from("groups").select("id").eq("owner_id", user.id) as { data: OwnedGroup[] | null };
+        const allGroupIds = [ ...new Set([ ...(followedGroups?.map((g) => g.group_id) || []), ...(ownedGroups?.map((g) => g.id) || []), ]), ];
+
+        if (allGroupIds.length === 0) { setPosts([]); setLoading(false); return; }
+
+        // 3. ดึง Posts ทั้งหมดจากกลุ่มที่เกี่ยวข้อง
+        const { data: postsData } = await supabase
+          .from("posts")
+          .select(
+            `id, content, created_at, user_id, group_id, media_urls,
+             likes(user_id), comments(id), groups(name, avatar_url)` 
+          )
+          .in("group_id", allGroupIds) 
+          .order("created_at", { ascending: false }) as { data: PostFromSupabase[] | null };
+
+        // 4. Map และคำนวณ State (Like/Comment Count)
+        const formattedPosts: Post[] =
+          postsData?.map((post) => ({
+            id: post.id,
+            content: post.content,
+            created_at: post.created_at,
+            user_id: post.user_id,
+            group_id: post.group_id,
+            media_urls: post.media_urls,
+            likesCount: post.likes?.length || 0,
+            commentsCount: post.comments?.length || 0,
+            likedByUser:
+              post.likes?.some((like) => like.user_id === user.id) || false,
+            group_name: post.groups?.name || "กลุ่มไม่ทราบชื่อ",
+            group_avatar_url: getGroupAvatarUrl(post.groups?.avatar_url), // Added
+          })) || [];
+
+        setPosts(formattedPosts);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [user]);
+
+  // ------------------ Handlers ------------------
+
+  // 1. Like Toggle (Optimistic Update)
+  const handleLikeToggle = async (postId: string, likedByUser: boolean) => {
+    if (!user) return;
+
+    // Optimistic Update
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              likedByUser: !likedByUser,
+              likesCount: likedByUser ? p.likesCount - 1 : p.likesCount + 1,
+            }
+          : p
+      )
+    );
+
+    try {
+      if (likedByUser) {
+        await supabase
+          .from("likes")
+          .delete()
+          .eq("post_id", postId)
+          .eq("user_id", user.id);
+      } else {
+        await supabase.from("likes").insert([
+          { post_id: postId, user_id: user.id },
+        ]);
+      }
+    } catch (err) {
+      console.error("Error toggling like:", err);
+      // Revert the optimistic update (คืนค่า UI ถ้า DB Fail)
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? {
+                ...p,
+                likedByUser: likedByUser,
+                likesCount: likedByUser ? p.likesCount + 1 : p.likesCount - 1,
+              }
+            : p
+        )
+      );
+    }
+  };
+
+  // 2. Update Comment Count (for Modal Callback)
+  const updateCommentCount = (postId: string) => {
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? { ...p, commentsCount: p.commentsCount + 1 }
+          : p
+      )
+    );
+  };
+
+  // 3. Logout (Handler Removed)
+
+
+  // ------------------ Render ------------------
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="w-10 h-10 animate-spin text-sky-600" />
+      </div>
+    );
 
   return (
-    <div className="min-h-screen bg-gray-50 font-inter">
-      {/* SIDEBAR (แถบเมนูหลักด้านซ้าย: แถบนำทางหลัก) */}
-      <header className="fixed left-0 top-37 h-full w-16 md:w-64 bg-white shadow-xl z-20 transition-all duration-300 border-r border-gray-200">
-        <div className="flex flex-col h-full">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 mt-20 space-y-6">
+      <div className="flex justify-between items-center pb-4 border-b border-gray-200">
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          {/* ปุ่มออกจากระบบถูกลบตามคำขอ */}
+      </div>
 
-          {/* TOP: Logo and Name (ส่วนหัวของ Sidebar) */}
-          <div className="flex items-center justify-center md:justify-start px-4 h-16 border-b border-gray-100 flex-shrink-0">
-            {/* <!-- Placeholder: โลโก้เว็บ --> */}
-            <div className="w-10  h-10 rounded-full flex items-center justify-center text-whi font-extrabold ">
-              <Link href="/dashboard">
-                <Image src="/logo.jpg" alt="Profile Icon" width={60} height={60} />
-              </Link>
+      {posts.length === 0 ? (
+        <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+          <h2 className="text-gray-900 font-semibold">ยังไม่มีโพสต์</h2>
+          <p className="text-gray-500 mt-1">
+            โพสต์จากกลุ่มที่คุณติดตามจะแสดงที่นี่
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {posts.map((post) => (
+            <div
+              key={post.id}
+              className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm"
+            >
+              {/* Header */}
+              <div className="flex justify-between items-start">
+                {/* แสดง Avatar และ Name ของกลุ่ม */}
+                <div className="flex items-center gap-3">
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-100 shrink-0">
+                        <Image src={post.group_avatar_url} alt="Group Avatar" fill className="object-cover" unoptimized />
+                    </div>
+                    <div>
+                        <p className="font-bold text-gray-900">
+                            โพสต์ในกลุ่ม: {post.group_name}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                            {new Date(post.created_at).toLocaleDateString("th-TH", {
+                              year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit",
+                            })}
+                        </p>
+                    </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <p className="mt-2 text-gray-700 whitespace-pre-wrap">
+                {post.content}
+              </p>
+
+              {/* Media Display */}
+              {post.media_urls?.length ? (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {post.media_urls.map((url, idx) => {
+                    const publicUrl = getPublicMediaUrl(url);
+                    const isVideo =
+                      publicUrl.endsWith(".mp4") ||
+                      publicUrl.endsWith(".webm");
+
+                    return (
+                      <div
+                        key={idx}
+                        className="relative w-32 h-32 rounded-lg overflow-hidden border bg-gray-100"
+                      >
+                        {isVideo ? (
+                          <video
+                            src={publicUrl}
+                            controls
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Image
+                            src={publicUrl}
+                            alt={`Post media ${idx}`}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+
+              {/* Actions */}
+              <div className="flex gap-4 text-gray-500 text-sm pt-3 mt-4 border-t border-gray-100">
+                {/* Like Button */}
+                <button
+                  onClick={() =>
+                    handleLikeToggle(post.id, post.likedByUser)
+                  }
+                  className={`flex items-center gap-1.5 transition-colors ${
+                    post.likedByUser ? "text-red-500" : "hover:text-red-400"
+                  }`}
+                >
+                  <Heart className="w-4 h-4 fill-current" />{" "}
+                  {post.likesCount} Likes
+                </button>
+
+                {/* Comment Button (Modal Trigger) */}
+                <button
+                  onClick={() => setActivePostIdForComments(post.id)}
+                  className="flex items-center gap-1.5 hover:text-sky-600"
+                >
+                  <MessageSquare className="w-4 h-4" />{" "}
+                  {post.commentsCount} Comments
+                </button>
+              </div>
             </div>
-
-            <h1 className="text-2xl text-gray-800 ml-3 hidden md:block" style={logoStyle} >
-              <Link href="/dashboard">  Our Zone </Link>
-            </h1>
-          </div>
-
-          {/* MIDDLE: Navigation Tabs (เมนูนำทาง) */}
-          {/* ใช้ flex-grow เพื่อให้เมนูนำทางใช้พื้นที่ที่เหลือทั้งหมด (เนื่องจากลบ Auth Buttons ออก) */}
-          <nav className="flex flex-col space-y-1 p-2 flex-grow overflow-y-auto">
-            <NavIcon icon={Home} tab="Home" activeTab={activeTab} onClick={setActiveTab} label="หน้าหลัก" />
-            <NavIcon icon={Users} tab="Friends" activeTab={activeTab} onClick={setActiveTab} label="เพื่อน" />
-            <NavIcon icon={Bell} tab="Notifications" activeTab={activeTab} onClick={setActiveTab} label="แจ้งเตือน" />
-            <NavIcon icon={Menu} tab="Settings" activeTab={activeTab} onClick={setActiveTab} label="เมนู" />
-          </nav>
+          ))}
         </div>
-      </header>
+      )}
 
-      {/* Main Content Area (พื้นที่เนื้อหาหลัก) */}
-      {/* ต้องมี margin ด้านซ้ายเพื่อไม่ให้ชนกับ Sidebar และทำให้เนื้อหาอยู่ตรงกลางอย่างสวยงาม */}
-      <main className={`${sidebarWidthClass} pt-4 pb-10 transition-all duration-300 min-h-screen`}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-0">
-          <MainContent activeTab={activeTab} />
+      {/* Comment Modal */}
+      {activePostIdForComments && user && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <DashboardCommentModal
+            postId={activePostIdForComments}
+            userId={user.id}
+            onClose={() => setActivePostIdForComments(null)}
+            updateCount={updateCommentCount}
+          />
         </div>
-      </main>
-
-      {/* Footer (ส่วนท้าย) */}
-      <footer className={`py-4 text-center text-xs text-gray-400 mt-8 border-t border-gray-200 ${sidebarWidthClass}`}>
-        &copy; 2024 Our Zone Community. All rights reserved.
-      </footer>
+      )}
     </div>
   );
-};
-
-export default App;
+}
