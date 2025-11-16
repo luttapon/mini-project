@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -7,6 +6,7 @@ import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Loader2, Heart, MessageSquare } from "lucide-react"; // ลบ LogOut ออก
 import DashboardCommentModal from "@/app/components/DashboardCommentModal"; 
+
 
 // ------------------ Types ------------------
 
@@ -234,6 +234,7 @@ export default function DashboardPage() {
           <p className="text-gray-500 mt-1">
             โพสต์จากกลุ่มที่คุณติดตามจะแสดงที่นี่
           </p>
+
         </div>
       ) : (
         <div className="grid gap-4">

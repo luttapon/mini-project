@@ -184,6 +184,7 @@ const App: React.FC = () => {
                         </button>
                     </form>
 
+
                     <p className="text-center text-sm text-gray-500 mt-6">
                         ยังไม่มีบัญชี?
                         <a href="#" className="font-medium text-blue-600 hover:text-blue-700" onClick={handleGoRegister}>

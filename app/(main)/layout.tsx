@@ -3,6 +3,7 @@ import { NavbarTop } from "@/app/components/NavbarTop";
 import { NavbarSub } from "@/app/components/NavbarSub";
 import { FollowedGroupsProvider } from "@/lib/context/FollowedGroupsContext";
 
+
 export default function MainLayout({
   children,
 }: Readonly<{

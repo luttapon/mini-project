@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Mail, User, Lock, LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
+
 
 // --- InputField Component (เหมือนเดิม) ---
 interface InputFieldProps {
@@ -88,7 +88,6 @@ const RegisterPage = () => {
     }
   };
 
-  const isFormComplete = email && username && password;
 
   return (
     <div
