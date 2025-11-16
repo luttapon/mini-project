@@ -24,11 +24,7 @@ const App: React.FC = () => {
     // สร้าง router 
     const router = useRouter();
 
-    /**
-     * แสดงข้อความในกล่องข้อความที่กำหนดเองและซ่อนโดยอัตโนมัติ
-     * @param text ข้อความที่จะแสดง
-     * @param type 'success' หรือ 'error'.
-     */
+
     const showMessage = (text: string, type: 'success' | 'error') => {
         setMessage({ text, type });
 
@@ -37,17 +33,7 @@ const App: React.FC = () => {
             setMessage({ text: '', type: '' });
         }, 5000);
     };
-    const handleGoogleSignIn = (): void => {
-        console.log('Google Sign-In Clicked - Initiating OAuth flow...');
-    };
-
-    const handleFacebookSignIn = (): void => {
-        console.log('Facebook Sign-In Clicked - Initiating OAuth flow...');
-    };
-    /**
-     *  
-     * @param e เหตุการณ์การส่งฟอร์ม
-     */
+    
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLoading(true); // เริ่ม Loading
@@ -73,7 +59,7 @@ const App: React.FC = () => {
 
             // รอ 1 วินาทีให้ผู้ใช้อ่านข้อความ แล้วค่อย Redirect
             setTimeout(() => {
-                router.push('/dashboard'); // ไปหน้าหลัก
+                router.push('/profile'); // ไปหน้าหลัก
                 router.refresh(); // (สำคัญ!) สั่งให้ Next.js โหลดข้อมูลใหม่ (ในฐานะ user ที่ login แล้ว)
             }, 1000);
         }
@@ -197,32 +183,7 @@ const App: React.FC = () => {
                             {loading ? 'กำลังตรวจสอบ...' : 'เข้าสู่ระบบ'}
                         </button>
                     </form>
-                    {/* ตัวแบ่งแนวนอน */}
-                    <div className="flex items-center my-6">
-                        <hr className="flex-grow border-t border-gray-300" aria-hidden="true" />
-                        <span className="mx-4 text-gray-500">หรือ</span>
-                        <hr className="flex-grow border-t border-gray-300" aria-hidden="true" />
-                    </div>
-                    {/* ปุ่มสำหรับ Social Sign-In  */}
-                    <div className="space-y-3 mb-6">
-                        <button
-                            onClick={handleGoogleSignIn}
-                            className="w-full flex items-center justify-center py-2.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out transform hover:scale-[1.005] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
-                        >
-                            <FontAwesomeIcon icon={faGoogle} className="w-5 h-5 mr-3 text-red-500" />
-                            เข้าสู่ระบบด้วย Google
-                        </button>
-                    </div>
 
-                    {/* กล่องข้อความสำหรับข้อเสนอแนะ */}
-                    {message.text && (
-                        <div
-                            id="messageBox"
-                            className={`mt-6 p-4 text-sm text-center rounded-lg transition-opacity duration-300 ${messageClasses}`}
-                        >
-                            {message.text}
-                        </div>
-                    )}
 
                     <p className="text-center text-sm text-gray-500 mt-6">
                         ยังไม่มีบัญชี?
