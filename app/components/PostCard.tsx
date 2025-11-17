@@ -3,7 +3,8 @@
 import Image from "next/image";
 import type { PostWithUser, CommentWithUser } from "@/types/supabase";
 import { supabase } from "@/lib/supabase/client";
-import { useState, useRef, useEffect, ChangeEvent } from "react"; 
+import { useState, useRef, useEffect, ChangeEvent } from "react";
+import { UsersRound } from "lucide-react"; 
 
 // ****************************************
 // Component Modal สำหรับแสดงรูปภาพ/วิดีโอขนาดใหญ่ (MediaModal)
@@ -443,8 +444,12 @@ export default function PostCard({
 
       {/* Group info */}
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-10 h-10 rounded-full overflow-hidden">
-          <Image src={avatarUrl} alt="Group Avatar" width={40} height={40} className="object-cover" unoptimized />
+        <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+          {groupAvatar && avatarUrl !== "https://via.placeholder.com/40" ? (
+            <Image src={avatarUrl} alt="Group Avatar" width={40} height={40} className="object-cover" unoptimized />
+          ) : (
+            <UsersRound className="w-6 h-6 text-gray-500" />
+          )}
         </div>
         <div className="flex flex-col">
           <span className="font-semibold">{groupName}</span>
@@ -626,9 +631,9 @@ export default function PostCard({
             <button
               type="button"
               onClick={handleLikeToggle}
-              className={`px-3 py-1 rounded-lg ${likedByUser ? "bg-red-500 text-white" : "bg-gray-200 text-gray-800"}`}
+              className={`px-3 py-1 rounded-lg hover:scale-105 hover:active:scale-93 transition cursor-pointer ${likedByUser ? "bg-red-400 text-white" : "bg-gray-300 text-gray-800"}`}
             >
-              {likedByUser ? "❤️ ไลค์แล้ว" : "🤍 ไลค์"} ({likesCount})
+              {likedByUser ? "❤️" : "🤍"} {likesCount}
             </button>
             <span className="text-gray-500">💬 {comments.length} ความคิดเห็น</span>
           </div>
@@ -702,7 +707,7 @@ export default function PostCard({
                 type="button"
                 onClick={handleAddComment}
                 disabled={!newComment.trim()}
-                className="px-3 py-1 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition disabled:opacity-50"
+                className="px-3 py-1 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition disabled:opacity-50 hover:scale-105 cursor-pointer"
               >
                 ส่ง
               </button>

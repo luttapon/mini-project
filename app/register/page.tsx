@@ -161,7 +161,7 @@ const RegisterPage = () => {
             className={`w-full py-3 rounded-lg text-white font-semibold shadow-lg transition duration-300 ease-in-out ${
               !isFormComplete || loading
                 ? "bg-indigo-300 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-[1.01] cursor-pointer"
+                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-[1.01] cursor-pointer active:scale-95"
             }`}
           >
             {loading ? "กำลังลงทะเบียน..." : "ลงทะเบียน"}

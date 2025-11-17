@@ -202,7 +202,7 @@ const GroupCalendar: React.FC<GroupCalendarProps> = ({
               setEventToEdit(null);
               setShowAddModal(true);
             }}
-            className="mt-5 w-full px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white font-semibold rounded-2xl hover:from-sky-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl active:scale-95"
+            className="mt-5 w-full px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-500 text-white font-semibold rounded-2xl hover:from-sky-600 hover:to-blue-600 transition-all shadow-lg hover:shadow-xl active:scale-95 cursor-pointer hover:scale-105"
           >
             ➕ เพิ่มวันสำคัญ
           </button>
@@ -248,7 +248,7 @@ const GroupCalendar: React.FC<GroupCalendarProps> = ({
               <button
                 title="Close the detail modal"
                 onClick={() => setShowDetail(false)}
-                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 transition-colors"
+                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 transition-colors cursor-pointer"
               >
                 ✕
               </button>
@@ -305,7 +305,7 @@ const GroupCalendar: React.FC<GroupCalendarProps> = ({
                       setShowDetail(false);
                       setShowAddModal(true);
                     }}
-                    className="flex-1 px-4 py-2.5 bg-sky-600 text-white font-semibold rounded-xl hover:bg-sky-700 transition-all shadow-lg shadow-sky-200"
+                    className="flex-1 px-4 py-2.5 bg-sky-600 text-white font-semibold rounded-xl hover:bg-sky-700 transition-all shadow-lg shadow-sky-200 cursor-pointer"
                   >
                     ✏️ แก้ไขกิจกรรม
                   </button>
@@ -324,7 +324,7 @@ const GroupCalendar: React.FC<GroupCalendarProps> = ({
                         alert((err as Error).message || "ลบกิจกรรมไม่สำเร็จ");
                       }
                     }}
-                    className="flex-1 px-4 py-2.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-200"
+                    className="flex-1 px-4 py-2.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-200 cursor-pointer"
                   >
                     🗑 ลบกิจกรรม
                   </button>

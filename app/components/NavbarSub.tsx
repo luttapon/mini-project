@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase/client";
 import { useFollowedGroups } from "@/lib/context/FollowedGroupsContext";
 import { usePathname } from "next/navigation";
 import type { RealtimeChannel } from "@supabase/supabase-js";
+import { UsersRound } from "lucide-react";
 
 // -------------------------------
 // Types
@@ -172,20 +173,22 @@ export const NavbarSub = () => {
                 title={group.name}
                 onClick={() => markGroupAsRead(group.id)}
               >
-                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 shadow-md hover:scale-105 transition-transform ">
-                  <Image
-                    src={
-                      group.avatar_url
-                        ? supabase.storage
-                            .from("groups")
-                            .getPublicUrl(group.avatar_url).data.publicUrl
-                        : "/default-group.png"
-                    }
-                    alt={group.name}
-                    width={40}
-                    height={40}
-                    className="object-cover w-full h-full"
-                  />
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 shadow-md hover:scale-105 transition-transform bg-gray-300 flex items-center justify-center">
+                  {group.avatar_url ? (
+                    <Image
+                      src={
+                        supabase.storage
+                          .from("groups")
+                          .getPublicUrl(group.avatar_url).data.publicUrl
+                      }
+                      alt={group.name}
+                      width={40}
+                      height={40}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <UsersRound className="w-5 h-5 text-gray-600" />
+                  )}
                 </div>
               </Link>
 
@@ -204,7 +207,7 @@ export const NavbarSub = () => {
       <div className="shrink-0">
         <Link
           href="/create"
-          className="flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-sky-700 hover:scale-105 shadow-md"
+          className="flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-sky-700 hover:scale-105 active:scale-95 shadow-md"
         >
           สร้างกลุ่ม
         </Link>

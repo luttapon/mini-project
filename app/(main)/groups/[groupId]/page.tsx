@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import Image from "next/image";
+import { UsersRound } from "lucide-react";
 import { useFollowedGroups } from "@/lib/context/FollowedGroupsContext";
 import GroupCalendar from "@/app/components/GroupCalendar";
 import PostFeed from "@/app/components/PostFeed";
@@ -58,6 +59,8 @@ export default function GroupDetailPage() {
 
   const [coverUrl, setCoverUrl] = useState("/default-cover.jpg");
   const [avatarUrl, setAvatarUrl] = useState("/default-group.png");
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -288,33 +291,78 @@ export default function GroupDetailPage() {
     );
   };
 
+  const handleImageClick = (imageUrl: string) => {
+    setModalImageUrl(imageUrl);
+    setShowImageModal(true);
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8 bg-gray-50 min-h-screen">
+      {/* Image Modal */}
+      {showImageModal && (
+        <div 
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowImageModal(false)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center">
+            <Image
+              src={modalImageUrl}
+              alt="Preview"
+              width={1200}
+              height={800}
+              className="object-contain max-w-full max-h-full"
+              unoptimized
+            />
+          </div>
+        </div>
+      )}
+
       {/* Header Area */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-        <div className="relative w-full h-44 md:h-52 lg:h-60">
-          <Image
-            src={coverUrl}
-            alt="Group Cover"
-            fill
-            className="object-cover opacity-40"
-            unoptimized
-          />
-          <div className="absolute inset-0 bg-black/10" />
+        <div 
+          className={`relative w-full h-44 md:h-52 lg:h-60 ${coverUrl !== "/default-cover.jpg" ? "cursor-pointer group" : ""}`}
+          onClick={() => coverUrl !== "/default-cover.jpg" && handleImageClick(coverUrl)}
+        >
+          {coverUrl === "/default-cover.jpg" ? (
+            <div className="w-full h-full bg-gray-300" />
+          ) : (
+            <>
+              <Image
+                src={coverUrl}
+                alt="Group Cover"
+                fill
+                className="object-cover opacity-40 group-hover:opacity-50 transition-opacity"
+                unoptimized
+              />
+              <div className="absolute inset-0 bg-black/10" />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="bg-black/50 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                  คลิกเพื่อดูรูป
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="px-6 pb-6 pt-6 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-5">
-              <div className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-white">
-                <Image
-                  src={avatarUrl}
-                  alt="Group Avatar"
-                  width={128}
-                  height={128}
-                  className="object-cover"
-                  unoptimized
-                />
+              <div 
+                className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-gray-100 cursor-pointer group flex items-center justify-center"
+                onClick={() => avatarUrl !== "/default-group.png" && handleImageClick(avatarUrl)}
+              >
+                {avatarUrl === "/default-group.png" ? (
+                  <UsersRound className="w-16 h-16 md:w-20 md:h-20 text-gray-400" />
+                ) : (
+                  <Image
+                    src={avatarUrl}
+                    alt="Group Avatar"
+                    width={128}
+                    height={128}
+                    className="object-cover group-hover:opacity-80 transition-opacity"
+                    unoptimized
+                  />
+                )}
               </div>
               <div className="mb-2 md:mb-4 pt-10">
                 <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 break-words">
@@ -331,13 +379,13 @@ export default function GroupDetailPage() {
                 <>
                   <button
                     onClick={() => router.push(`/groups/${group.id}/edit`)}
-                    className="px-5 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full font-semibold transition shadow-md"
+                    className="px-5 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full font-semibold transition shadow-md cursor-pointer hover:scale-105 active:scale-93"
                   >
                     แก้ไขกลุ่ม
                   </button>
                   <button
                     onClick={handleDeleteGroup}
-                    className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-full font-semibold transition shadow-md"
+                    className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-full font-semibold transition shadow-md cursor-pointer hover:scale-105 active:scale-93"
                   >
                     ลบกลุ่ม
                   </button>
@@ -345,7 +393,7 @@ export default function GroupDetailPage() {
               ) : (
                 <button
                   onClick={handleFollowToggle}
-                  className={`px-5 py-2.5 rounded-full font-semibold transition shadow-md ${
+                  className={`px-5 py-2.5 rounded-full font-semibold transition shadow-md cursor-pointer hover:scale-105 active:scale-93 ${
                     isFollowing
                       ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
                       : "bg-sky-600 text-white hover:bg-sky-700"

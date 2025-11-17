@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
-import { PlusCircle } from 'lucide-react'
+import { PlusCircle, UsersRound } from 'lucide-react'
 
 interface Group {
   id: string
@@ -101,7 +101,13 @@ export default function MyGroupsPage() {
                 <div className="absolute inset-0 bg-black/40"></div>
               {/* Avatar */}
               <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                <img src={avatarUrl} alt={group.name} className="w-full h-full object-cover" />
+                {group.avatar_url ? (
+                  <img src={avatarUrl} alt={group.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                    <UsersRound className="w-10 h-10 text-gray-600" />
+                  </div>
+                )}
               </div>
 
               {/* Name */}
