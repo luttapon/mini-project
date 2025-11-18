@@ -103,7 +103,7 @@ const RegisterPage = () => {
     <div
       className="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-cover bg-center"
       style={{
-        backgroundImage: `url("/homepage.png")`, // ใช้ Default Background ของหน้า
+        backgroundImage: `url("/wallpaper3.png")`, // ใช้ Default Background ของหน้า
         fontFamily: "Inter, sans-serif",
       }}
     >

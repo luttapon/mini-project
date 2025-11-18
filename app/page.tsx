@@ -12,7 +12,7 @@ export default function Page() {
       style={
         {
           backgroundImage:
-            'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/bg.png)'
+            'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/wallpaper5.png)'
         }
       }
     >

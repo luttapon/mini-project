@@ -89,7 +89,7 @@ const App: React.FC = () => {
 
     // ---------------------------------------------------------------------
     // กำหนดแหล่งที่มาของภาพพื้นหลัง 
-    const imagePathFromPublic = '/bglogin.png'; // ใช้ภาพจากโฟลเดอร์ public
+    const imagePathFromPublic = '/wallpaper4.jpg'; // ใช้ภาพจากโฟลเดอร์ public
     const backgroundImageSource = imagePathFromPublic;
 
     // ---------------------------------------------------------------------
