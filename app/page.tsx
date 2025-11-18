@@ -32,14 +32,14 @@ export default function Page() {
           <button
             type="button"
             onClick={() => router.push('/login')}
-            className="rounded-full bg-sky-600 px-10 py-4 text-lg text-white shadow-lg transition hover:bg-sky-800 cursor-pointer"
+            className="rounded-full bg-sky-600 px-10 py-4 text-lg text-white shadow-lg transition hover:bg-sky-800 cursor-pointer hover:scale-105 active:scale-95"
           >
             เข้าสู่ระบบ
           </button>
           <button
             type="button"
             onClick={() => router.push('/register')}
-            className="rounded-full bg-white px-10 py-4 text-lg text-indigo-600 shadow-lg transition hover:bg-gray-300 cursor-pointer"
+            className="rounded-full bg-white px-10 py-4 text-lg text-indigo-600 shadow-lg transition hover:bg-gray-300 cursor-pointer hover:scale-105 active:scale-95"
           >
             ลงทะเบียน
           </button>

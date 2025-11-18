@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { User as UserIcon } from "lucide-react";
 
 // -------------------------------
 // Types
@@ -142,14 +143,18 @@ export const NavbarTop = () => {
       {/* RIGHT: Avatar */}
       <div className="flex-1 flex justify-end items-center gap-5">
         <Link href="/profile">
-          <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-yellow-400">
-            <Image
-              src={avatar ?? "/profile.jpg"}
-              alt="avatar"
-              width={40}
-              height={40}
-              className="object-cover w-full h-full"
-            />
+          <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-yellow-400 bg-gray-100 flex items-center justify-center">
+            {avatar ? (
+              <Image
+                src={avatar}
+                alt="avatar"
+                width={40}
+                height={40}
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <UserIcon className="w-6 h-6 text-gray-400" />
+            )}
           </div>
         </Link>
       </div>

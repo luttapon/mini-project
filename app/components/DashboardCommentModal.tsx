@@ -106,7 +106,7 @@ export default function DashboardCommentModal({ postId, userId, onClose, updateC
             <div className="p-4 border-b flex justify-between items-center shrink-0">
                 <h3 className="text-lg font-bold">ความคิดเห็นทั้งหมด ({comments.length})</h3>
                 <button onClick={onClose} type="button" aria-label="ปิดหน้าต่าง" className="text-gray-500 hover:text-gray-900 font-bold text-2xl leading-none">
-                    <X className="w-6 h-6" />
+                    <X className="w-6 h-6 cursor-pointer" />
                 </button>
             </div>
             
@@ -151,7 +151,7 @@ export default function DashboardCommentModal({ postId, userId, onClose, updateC
                 <button
                     type="submit"
                     disabled={!commentText.trim() || isSubmitting}
-                    className="bg-sky-600 text-white px-5 py-2 rounded-full font-semibold disabled:opacity-50 transition-all flex items-center gap-1"
+                    className="bg-sky-600 text-white px-5 py-2 rounded-full font-semibold disabled:opacity-50 transition-all flex items-center gap-1 cursor-pointer active:scale-95 hover:bg-sky-700 "
                 >
                     {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                     <span>ส่ง</span>

@@ -178,7 +178,7 @@ const App: React.FC = () => {
                         <button
                             type="submit"
                             disabled={loading || !username || !password}
-                            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md shadow-blue-600/30 hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 text-lg cursor-pointer"
+                            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md shadow-blue-600/30 hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 text-lg cursor-pointer active:scale-95"
                         >
                             {loading ? 'กำลังตรวจสอบ...' : 'เข้าสู่ระบบ'}
                         </button>

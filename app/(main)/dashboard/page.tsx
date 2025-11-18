@@ -310,7 +310,7 @@ export default function DashboardPage() {
                   onClick={() =>
                     handleLikeToggle(post.id, post.likedByUser)
                   }
-                  className={`flex items-center gap-1.5 transition-colors ${
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
                     post.likedByUser ? "text-red-500" : "hover:text-red-400"
                   }`}
                 >
@@ -321,7 +321,7 @@ export default function DashboardPage() {
                 {/* Comment Button (Modal Trigger) */}
                 <button
                   onClick={() => setActivePostIdForComments(post.id)}
-                  className="flex items-center gap-1.5 hover:text-sky-600"
+                  className="flex items-center gap-1.5 hover:text-sky-600 cursor-pointer"
                 >
                   <MessageSquare className="w-4 h-4" />{" "}
                   {post.commentsCount} Comments

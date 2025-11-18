@@ -148,8 +148,8 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
             {success && <div className="p-3 bg-green-50 text-green-700 rounded-md">บันทึกสำเร็จ!</div>}
 
             <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100">
-              <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-600">ยกเลิก</button>
-              <button type="submit" disabled={loading} className="px-6 py-2.5 rounded-xl bg-sky-600 text-white hover:bg-sky-700">
+              <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-600 transition cursor-pointer hover:bg-gray-50 hover:scale-105 active:scale-93">ยกเลิก</button>
+              <button type="submit" disabled={loading} className="px-6 py-2.5 rounded-xl bg-sky-600 text-white hover:bg-sky-700 transition cursor-pointer hover:scale-105 active:scale-93">
                 {loading ? "กำลังบันทึก..." : eventToEdit ? "บันทึกการแก้ไข" : "บันทึกกิจกรรม"}
               </button>
             </div>

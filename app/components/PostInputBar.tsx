@@ -143,7 +143,7 @@ export default function PostInputBar({ groupId, userId, onPosted }: PostInputBar
         </div>
       )}
       <div className="flex justify-between items-center">
-        <label className="cursor-pointer text-blue-600 font-medium">
+        <label className="cursor-pointer text-blue-600 font-medium hover:text-blue-700 hover:underline transition-all active:scale-95">
           เพิ่มรูป / วิดีโอ
           <input
             type="file"
@@ -157,7 +157,7 @@ export default function PostInputBar({ groupId, userId, onPosted }: PostInputBar
           type="button" // เพิ่ม type
           onClick={handleSubmit}
           disabled={loading || (!text.trim() && files.length === 0)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-xl disabled:opacity-50"
+          className="bg-blue-600 text-white px-4 py-2 rounded-xl disabled:opacity-50 hover:bg-blue-700 transition hover:scale-105 cursor-pointer"
         >
           {loading ? "กำลังโพสต์..." : "โพสต์"}
         </button>
