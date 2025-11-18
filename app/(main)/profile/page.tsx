@@ -658,7 +658,7 @@ export default function Page() {
                         onClick={() =>
                           handleProfileLikeToggle(post.id, post.likedByUser)
                         }
-                        className={`flex items-center gap-1.5 ${
+                        className={`flex items-center gap-1.5 cursor-pointer ${
                           post.likedByUser
                             ? "text-red-500"
                             : "hover:text-gray-900"
@@ -668,7 +668,7 @@ export default function Page() {
                       </button>
                       <button
                         onClick={() => setActivePostIdForComments(post.id)}
-                        className="flex items-center gap-1.5 hover:text-gray-900"
+                        className="flex items-center gap-1.5 hover:text-gray-900 cursor-pointer"
                       >
                         <MessageSquare className="w-4 h-4" />{" "}
                         {post.commentsCount}
