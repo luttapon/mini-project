@@ -156,29 +156,30 @@ export default function VerifyOtpPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center mb-2">
-          ยืนยันตัวตน
-        </h1>
+        <h1 className="text-2xl font-bold text-center mb-2">ยืนยันตัวตน</h1>
         <p className="text-center text-gray-600 mb-6">
           กรุณากรอกรหัส 6 หลักที่เราส่งไปให้ที่อีเมล <strong>{email}</strong>
         </p>
-
-{/* แสดงข้อความสถานะ/แจ้งเตือน */}
-        {message && (
-          <div className={`p-3 mb-4 rounded-lg text-sm font-medium break-words ${
-            isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-          }`}>
-            {message}
-          </div>
-        )}
-        
-        {/* คำเตือนหากยังไม่ได้ตั้งค่า Supabase */}
-        {(!supabase && !message) && (
-            <div className="p-3 mb-4 rounded-lg text-sm font-medium bg-yellow-100 text-yellow-800">
-                <strong>คำเตือน:</strong> กรุณาตั้งค่า <code>YOUR_SUPABASE_URL</code> และ <code>YOUR_SUPABASE_ANON_KEY</code> ในโค้ด
-            </div>
-        )}
-
+        {/* แสดงข้อความสถานะ/แจ้งเตือน */}       {" "}
+        {message && (
+          <div
+            className={`p-3 mb-4 rounded-lg text-sm font-medium break-words ${
+              isError
+                ? "bg-red-100 text-red-700"
+                : "bg-green-100 text-green-700"
+            }`}
+          >
+                        {message}         {" "}
+          </div>
+        )}
+                        {/* คำเตือนหากยังไม่ได้ตั้งค่า Supabase */}       {" "}
+        {!supabase && !message && (
+          <div className="p-3 mb-4 rounded-lg text-sm font-medium bg-yellow-100 text-yellow-800">
+                            <strong>คำเตือน:</strong> กรุณาตั้งค่า{" "}
+            <code>YOUR_SUPABASE_URL</code> และ{" "}
+            <code>YOUR_SUPABASE_ANON_KEY</code> ในโค้ด            {" "}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           {/* ส่วนของ OTP Inputs */}
           <div className="flex justify-center gap-2 mb-6">
@@ -205,22 +206,25 @@ export default function VerifyOtpPage() {
           {/* ปุ่ม Submit */}
           <button
             type="submit"
-            disabled={isLoading || !email || !supabase || otp.join('').length < 6}
+            disabled={
+              isLoading || !email || !supabase || otp.join("").length < 6
+            }
             className={`w-full py-3 rounded-lg text-white font-semibold shadow-lg transition duration-300 ease-in-out mt-2 ${
-              (isLoading || !email || !supabase || otp.join('').length < 6)
-                ? 'bg-indigo-300 cursor-not-allowed'
-                : 'bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-[1.01]'
-            }`}
+              isLoading || !email || !supabase || otp.join("").length < 6
+                ? "bg-indigo-300 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-[1.01] cursor-pointer"
+            }`}
           >
-            {isLoading ? 'กำลังตรวจสอบ...' : 'ยืนยันรหัส OTP'}
+            {isLoading ? "กำลังตรวจสอบ..." : "ยืนยันรหัส OTP"}
           </button>
         </form>
-
         {/* ลิงก์ Resend Code */}
         <div className="text-center mt-4">
-          <button onClick={handleResendCode}
-            disabled={isLoading || !email || !supabase}
-            className="text-sm text-indigo-600 hover:text-indigo-500 disabled:text-gray-400 disabled:cursor-not-allowed">
+          <button
+            onClick={handleResendCode}
+            disabled={isLoading || !email || !supabase}
+            className="text-sm text-indigo-600 hover:text-indigo-500 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer"
+          >
             ไม่ได้รับรหัส? ส่งอีกครั้ง
           </button>
         </div>

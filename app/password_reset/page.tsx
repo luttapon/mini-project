@@ -198,7 +198,7 @@ const PasswordResetForm = () => {
             className={`w-full py-3 rounded-lg text-white font-semibold shadow-lg transition duration-300 ease-in-out mt-2 ${
               !email || isLoading || !supabase
                 ? "bg-indigo-300 cursor-not-allowed" // สไตล์เมื่อปุ่มถูกปิดใช้งาน
-                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-[1.01]" // สไตล์เมื่อปุ่มพร้อมใช้งาน
+                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-[1.01] cursor-pointer" // สไตล์เมื่อปุ่มพร้อมใช้งาน
             }`}
           >
             {isLoading ? "กำลังส่ง..." : "ส่งรหัส OTP"}
