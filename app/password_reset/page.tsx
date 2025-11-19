@@ -25,7 +25,7 @@ const InputField = ({
 }: InputFieldProps) => (
   <div className="relative mb-4">
     {/* แสดง Icon ที่ถูกส่งเข้ามาเป็น Prop */}
-    <div className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400">
+    <div className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500">
       {icon}
     </div>
     <input
@@ -146,8 +146,11 @@ const PasswordResetForm = () => {
         fontFamily: "Inter, sans-serif",
       }}
     >
+      {/* Overlay เพื่อให้ข้อความอ่านง่ายขึ้น */}
+      <div className="absolute inset-0 bg-black opacity-40"></div>
+
       {/* กล่องสีขาว: Card สำหรับแบบฟอร์ม */}
-      <div className="w-full max-w-md bg-white p-8 md:p-10 rounded-xl shadow-2xl border border-gray-200">
+      <div className="w-full max-w-md bg-white/60 backdrop-blur-md p-8 md:p-10 rounded-xl shadow-2xl border border-white/90 relative z-10">
         {/* หัวข้อ: รีเซ็ตรหัสผ่าน */}
         <h1 className="text-3xl font-extrabold text-gray-900 text-center mb-4">
           รีเซ็ตรหัสผ่าน

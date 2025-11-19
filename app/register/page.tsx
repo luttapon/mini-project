@@ -24,7 +24,7 @@ const InputField = ({
   id,
 }: InputFieldProps) => (
   <div className="relative mb-4">
-    <Icon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+    <Icon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
     <input
       type={type}
       value={value}
@@ -107,7 +107,10 @@ const RegisterPage = () => {
         fontFamily: "Inter, sans-serif",
       }}
     >
-      <div className="w-full max-w-md bg-white p-8 md:p-10 rounded-2xl shadow-2xl border border-gray-200">
+      {/* Overlay เพื่อให้ข้อความอ่านง่ายขึ้น */}
+      <div className="absolute inset-0 bg-black opacity-40"></div>
+
+      <div className="w-full max-w-md bg-white/60 backdrop-blur-md p-8 md:p-10 rounded-2xl shadow-2xl border border-white/90 relative z-10">
         <h1 className="text-3xl font-extrabold text-gray-900 text-center mb-3">
           ลงทะเบียน
         </h1>

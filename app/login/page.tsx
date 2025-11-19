@@ -119,7 +119,7 @@ const App: React.FC = () => {
                     <span className="text-base font-semibold">ย้อนกลับ</span>
                 </button>
 
-                <div className="bg-white p-8 sm:p-10 shadow-2xl rounded-xl border border-gray-100 transform transition duration-500 hover:shadow-indigo-600/20">
+                <div className="bg-white/60 backdrop-blur-md p-8 sm:p-10 shadow-2xl rounded-xl border border-white/90 transform transition duration-500 hover:shadow-indigo-600/20">
 
                     <div className="text-center mb-8">
                         {/* เข้าสู่ระบบ */}
@@ -145,7 +145,7 @@ const App: React.FC = () => {
                                 required
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out placeholder-gray-400 text-base"
+                                className="w-full px-4 py-2 border border-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out placeholder-gray-400 text-base"
                                 aria-label="ชื่อผู้ใช้ หรือ อีเมล"
                             />
                         </div>
@@ -163,7 +163,7 @@ const App: React.FC = () => {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out placeholder-gray-400 text-base"
+                                className="w-full px-4 py-2 border border-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out placeholder-gray-400 text-base"
                                 aria-label="รหัสผ่าน"
                             />
                             <div className="flex justify-end mt-2">
@@ -186,7 +186,7 @@ const App: React.FC = () => {
 
 
                     <p className="text-center text-sm text-gray-500 mt-6">
-                        ยังไม่มีบัญชี?
+                        ยังไม่มีบัญชี?{' '}
                         <a href="#" className="font-medium text-blue-600 hover:text-blue-700" onClick={handleGoRegister}>
                             ลงทะเบียนที่นี่
                         </a>

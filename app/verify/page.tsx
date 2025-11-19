@@ -154,8 +154,17 @@ export default function VerifyOtpPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-sm">
+    <div 
+      className="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-cover bg-center"
+      style={{
+        backgroundImage: `url("/wallpaper4.jpg")`,
+        fontFamily: "Inter, sans-serif",
+      }}
+    >
+      {/* Overlay เพื่อให้ข้อความอ่านง่ายขึ้น */}
+      <div className="absolute inset-0 bg-black opacity-40"></div>
+
+      <div className="p-8 bg-white/60 backdrop-blur-md rounded-lg shadow-2xl border border-white/90 w-full max-w-sm relative z-10">
         <h1 className="text-2xl font-bold text-center mb-2">ยืนยันตัวตน</h1>
         <p className="text-center text-gray-600 mb-6">
           กรุณากรอกรหัส 6 หลักที่เราส่งไปให้ที่อีเมล <strong>{email}</strong>
