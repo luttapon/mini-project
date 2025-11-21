@@ -4,7 +4,7 @@ import { Mail, User, Lock, LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 
-// --- InputField Component (เหมือนเดิม) ---
+// --- InputField Component - ปรับสไตล์ให้เหมือนหน้า Login ---
 interface InputFieldProps {
   icon: LucideIcon;
   type: string;
@@ -24,7 +24,8 @@ const InputField = ({
   id,
 }: InputFieldProps) => (
   <div className="relative mb-4">
-    <Icon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+    {/* ไอคอนด้านซ้ายของ input - ปรับตำแหน่งให้เหมาะสม */}
+    <Icon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
     <input
       type={type}
       value={value}
@@ -32,7 +33,7 @@ const InputField = ({
       placeholder={placeholder}
       required={required}
       id={id}
-      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out placeholder-gray-500 shadow-sm"
+      className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 border-2 border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 ease-in-out placeholder-gray-400 text-sm sm:text-base shadow-sm hover:border-gray-400"
     />
   </div>
 );
@@ -100,93 +101,122 @@ const RegisterPage = () => {
     password.trim() !== "";
 
   return (
+    // คอนเทนเนอร์หลักที่มีพื้นหลังเป็นรูปภาพ - เพิ่ม padding สำหรับมือถือ
     <div
-      className="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-cover bg-center"
+      className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8 bg-cover bg-center"
       style={{
-        backgroundImage: `url("/wallpaper3.png")`, // ใช้ Default Background ของหน้า
+        backgroundImage: `url("/wallpaper3.png")`,
         fontFamily: "Inter, sans-serif",
       }}
     >
-      {/* Overlay เพื่อให้ข้อความอ่านง่ายขึ้น */}
-      <div className="absolute inset-0 bg-black opacity-40"></div>
+      {/* Overlay เพื่อให้ข้อความอ่านง่ายขึ้น เพิ่มความเข้มเพื่อความคมชัดของตัวอักษร */}
+      <div className="absolute inset-0 bg-black opacity-50"></div>
 
-      <div className="w-full max-w-md bg-white/60 backdrop-blur-md p-8 md:p-10 rounded-2xl shadow-2xl border border-white/90 relative z-10">
-        <h1 className="text-3xl font-extrabold text-gray-900 text-center mb-3">
-          ลงทะเบียน
-        </h1>
-        <p className="mt-2 text-sm text-gray-500 text-center mb-6">
-          โปรดกรอกรายละเอียดเพื่อดำเนินการต่อ
-        </p>
+      {/* การ์ดหลัก */}
+      <div className="w-full max-w-md relative z-10 px-2 sm:px-0">
 
-        {message && (
-          <div
-            className={`p-3 mb-4 rounded-lg text-sm font-medium ${
-              message.startsWith("สำเร็จ")
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }`}
-          >
-            {message}
+        <div className="bg-white/50 backdrop-blur-lg p-6 sm:p-8 md:p-10 shadow-2xl rounded-2xl border-2 border-white/30 transform transition duration-500 hover:shadow-indigo-600/30">
+          
+          {/* หัวข้อและคำบรรยาย */}
+          <div className="text-center mb-6 sm:mb-8 space-y-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
+              ลงทะเบียน
+            </h1>
+            <p className="mt-2 text-xs sm:text-sm text-gray-600 font-medium px-2">
+              โปรดกรอกรายละเอียดเพื่อดำเนินการต่อ
+            </p>
           </div>
-        )}
 
-        {/* --- !! ลบ JSX ของการอัปโหลดไฟล์ออก !! --- */}
-        <form onSubmit={handleRegister} className="space-y-6">
-          {/* Inputs */}
-          <InputField
-            id="email-input"
-            icon={Mail}
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="อีเมล (Email)"
-          />
-          <InputField
-            id="username-input"
-            icon={User}
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="ชื่อผู้ใช้ (Username)"
-          />
-          <InputField
-            id="password-input"
-            icon={Lock}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="รหัสผ่าน (Password)"
-          />
+          {/* กล่องข้อความแจ้งเตือน */}
+          {message && (
+            <div
+              className={`p-3 mb-4 rounded-lg text-xs sm:text-sm font-semibold ${
+                message.startsWith("สำเร็จ")
+                  ? "bg-green-100 text-green-700 border border-green-300"
+                  : "bg-red-100 text-red-700 border border-red-300"
+              }`}
+            >
+              {message}
+            </div>
+          )}
 
-          <button
-            type="submit"
-            disabled={!isFormComplete || loading} // <-- ใช้ isFormComplete ที่นี่
-            className={`w-full py-3 rounded-lg text-white font-semibold shadow-lg transition duration-300 ease-in-out ${
-              !isFormComplete || loading
-                ? "bg-indigo-300 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-[1.01] cursor-pointer active:scale-95"
-            }`}
-          >
-            {loading ? "กำลังลงทะเบียน..." : "ลงทะเบียน"}
-          </button>
-        </form>
+          {/* ฟอร์มลงทะเบียน */}
+          <form onSubmit={handleRegister} className="space-y-4">
+            {/* Input Fields */}
+            <div>
+              <label htmlFor="email-input" className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2">
+                อีเมล
+              </label>
+              <InputField
+                id="email-input"
+                icon={Mail}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@mail.com"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="username-input" className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2">
+                ชื่อผู้ใช้
+              </label>
+              <InputField
+                id="username-input"
+                icon={User}
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="password-input" className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2">
+                รหัสผ่าน
+              </label>
+              <InputField
+                id="password-input"
+                icon={Lock}
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+            </div>
 
-        {/* Divider */}
-        <div className="flex items-center my-6">
-          <hr className="flex-grow border-t border-gray-300" aria-hidden="true" />
-          <span className="mx-4 text-gray-500">หรือ</span>
-          <hr className="flex-grow border-t border-gray-300" aria-hidden="true" />
-        </div>
+            {/* ปุ่มลงทะเบียน */}
+            <button
+              type="submit"
+              disabled={!isFormComplete || loading}
+              className={`w-full py-3 sm:py-3.5 rounded-xl font-bold shadow-lg transition-all duration-300 ease-in-out text-base sm:text-lg mt-6 ${
+                !isFormComplete || loading
+                  ? "bg-indigo-300 text-white cursor-not-allowed opacity-50"
+                  : "bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-indigo-600/40 hover:shadow-indigo-600/60 hover:from-indigo-700 hover:to-indigo-800 transform hover:scale-[1.02] cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              }`}
+            >
+              {loading ? "กำลังลงทะเบียน..." : "ลงทะเบียน"}
+            </button>
+          </form>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
-          มีบัญชีอยู่แล้ว?
-          <a
-            href="/login"
-            className="font-medium text-indigo-600 hover:text-indigo-500 ml-1"
-            onClick={handleGoLogin}
-          >
-            เข้าสู่ระบบ
-          </a>
+          {/* Divider */}
+          <div className="flex items-center my-5 sm:my-6">
+            <hr className="flex-grow border-t border-gray-300" aria-hidden="true" />
+            <span className="mx-3 sm:mx-4 text-xs sm:text-sm text-gray-500 font-medium">หรือ</span>
+            <hr className="flex-grow border-t border-gray-300" aria-hidden="true" />
+          </div>
+
+          {/* ข้อความและลิงก์เข้าสู่ระบบ */}
+          <div className="text-center text-xs sm:text-sm text-gray-700 font-medium">
+            มีบัญชีอยู่แล้ว?{" "}
+            <a
+              href="/login"
+              className="font-bold text-indigo-600 hover:text-indigo-800 transition duration-200 underline-offset-2 hover:underline"
+              onClick={handleGoLogin}
+            >
+              เข้าสู่ระบบ
+            </a>
+          </div>
         </div>
       </div>
     </div>

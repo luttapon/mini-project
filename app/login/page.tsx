@@ -95,46 +95,47 @@ const App: React.FC = () => {
     // ---------------------------------------------------------------------
 
     return (
-        // คอนเทนเนอร์หลักที่มีพื้นหลังเป็นรูปภาพ
+        // คอนเทนเนอร์หลักที่มีพื้นหลังเป็นรูปภาพ เพิ่ม padding สำหรับมือถือ
         <div
-            className="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-cover bg-center"
+            className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8 bg-cover bg-center"
             style={{ backgroundImage: `url(${backgroundImageSource})`, fontFamily: 'Inter, sans-serif' }}
         >
-            {/* Overlay เพื่อให้ข้อความอ่านง่ายขึ้น */}
-            <div className="absolute inset-0 bg-black opacity-40"></div>
+            {/* Overlay เพื่อให้ข้อความอ่านง่ายขึ้น เพิ่มความเข้มเพื่อความคมชัดของตัวอักษร */}
+            <div className="absolute inset-0 bg-black opacity-50"></div>
 
-            {/* คอนเทนเนอร์การ์ดเข้าสู่ระบบ */}
-            <div className="w-full max-w-md relative z-10">
+            {/* คอนเทนเนอร์การ์ดเข้าสู่ระบบ จำกัดความกว้างสูงสุดสำหรับมือถือ */}
+            <div className="w-full max-w-md relative z-10 px-2 sm:px-0">
 
-                {/* ปุ่มย้อนกลับ (Back Button) */}
+                {/* ปุ่มย้อนกลับ ปรับขนาดและ shadow เพื่อความชัดเจน */}
                 <button
                     onClick={handleGoBack}
                     aria-label="ย้อนกลับไปหน้าหลัก"
-                    className="flex items-center justify-center mb-4 text-white hover:text-gray-200 transition duration-150 p-2 rounded-full transform -translate-x-2 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    className="flex items-center justify-start mb-4 sm:mb-6 text-white hover:text-gray-200 transition-all duration-200 p-2 px-3 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/40 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg cursor-pointer"
                 >
                     {/* SVG Icon: Arrow Left */}
-                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
-                    <span className="text-base font-semibold">ย้อนกลับ</span>
+                    <span className="text-sm sm:text-base font-semibold drop-shadow-lg">ย้อนกลับ</span>
                 </button>
 
-                <div className="bg-white/60 backdrop-blur-md p-8 sm:p-10 shadow-2xl rounded-xl border border-white/90 transform transition duration-500 hover:shadow-indigo-600/20">
+                {/* การ์ดหลัก */}
+                <div className="bg-white/50 backdrop-blur-lg p-6 sm:p-8 md:p-10 shadow-2xl rounded-2xl border-2 border-white/30 transform transition duration-500 hover:shadow-indigo-600/30">
 
-                    <div className="text-center mb-8">
-                        {/* เข้าสู่ระบบ */}
-                        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+                    {/* หัวข้อและคำบรรยาย */}
+                    <div className="text-center mb-6 sm:mb-8 space-y-2">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
                             เข้าสู่ระบบ
                         </h1>
-                        <p className="mt-2 text-sm text-gray-500">
+                        <p className="mt-2 text-xs sm:text-sm text-gray-600 font-medium px-2">
                             โปรดกรอกรายละเอียดเพื่อดำเนินการต่อ
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit}>
-                        {/* ช่องป้อน: ชื่อผู้ใช้หรืออีเมล */}
-                        <div className="mb-5">
-                            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* ช่องป้อนอีเมล */}
+                        <div className="mb-4 sm:mb-5">
+                            <label htmlFor="username" className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2">
                                 อีเมล
                             </label>
                             <input
@@ -145,14 +146,14 @@ const App: React.FC = () => {
                                 required
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full px-4 py-2 border border-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out placeholder-gray-400 text-base"
+                                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out placeholder-gray-400 text-sm sm:text-base shadow-sm hover:border-gray-400"
                                 aria-label="ชื่อผู้ใช้ หรือ อีเมล"
                             />
                         </div>
 
-                        {/* ช่องป้อน: รหัสผ่าน */}
-                        <div className="mb-6">
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                        {/* ช่องป้อนรหัสผ่าน */}
+                        <div className="mb-5 sm:mb-6">
+                            <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2">
                                 รหัสผ่าน
                             </label>
                             <input
@@ -163,31 +164,39 @@ const App: React.FC = () => {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-2 border border-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out placeholder-gray-400 text-base"
+                                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out placeholder-gray-400 text-sm sm:text-base shadow-sm hover:border-gray-400"
                                 aria-label="รหัสผ่าน"
                             />
-                            <div className="flex justify-end mt-2">
-                                <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-700 transition duration-150 ease-in-out"
-                                    onClick={handleGopasswordreset}>
+                            {/* ลิงก์ลืมรหัสผ่าน */}
+                            <div className="flex justify-end mt-2 sm:mt-3">
+                                <a 
+                                    href="#" 
+                                    className="text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-800 transition duration-200 ease-in-out underline-offset-2 hover:underline py-1 px-2 rounded"
+                                    onClick={handleGopasswordreset}
+                                >
                                     ลืมรหัสผ่าน?
                                 </a>
                             </div>
                         </div>
 
-                        {/* ปุ่มส่ง: เข้าสู่ระบบ */}
+                        {/* ปุ่ม เข้าสู่ระบบ */}
                         <button
                             type="submit"
                             disabled={loading || !username || !password}
-                            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md shadow-blue-600/30 hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 text-lg cursor-pointer active:scale-95"
+                            className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/40 hover:shadow-blue-600/60 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 ease-in-out transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-base sm:text-lg cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                         >
                             {loading ? 'กำลังตรวจสอบ...' : 'เข้าสู่ระบบ'}
                         </button>
                     </form>
 
-
-                    <p className="text-center text-sm text-gray-500 mt-6">
+                    {/* ข้อความและลิงก์ลงทะเบียน */}
+                    <p className="text-center text-xs sm:text-sm text-gray-700 mt-6 sm:mt-8 font-medium">
                         ยังไม่มีบัญชี?{' '}
-                        <a href="#" className="font-medium text-blue-600 hover:text-blue-700" onClick={handleGoRegister}>
+                        <a 
+                            href="#" 
+                            className="font-bold text-blue-600 hover:text-blue-800 transition duration-200 underline-offset-2 hover:underline" 
+                            onClick={handleGoRegister}
+                        >
                             ลงทะเบียนที่นี่
                         </a>
                     </p>

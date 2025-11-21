@@ -223,9 +223,13 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 mt-20 space-y-6">
-      <div className="flex justify-between items-center pb-4 border-b border-gray-200">
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          {/* ปุ่มออกจากระบบถูกลบตามคำขอ */}
+      <div className="bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl p-8 shadow-lg mb-8">
+          <h1 className="text-4xl font-extrabold text-white tracking-tight">
+            📰 Dashboard
+          </h1>
+          <p className="text-sky-100 mt-2 text-sm">
+            ติดตามโพสต์และกิจกรรมจากกลุ่มที่คุณสนใจ
+          </p>
       </div>
 
       {posts.length === 0 ? (
