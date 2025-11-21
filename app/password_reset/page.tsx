@@ -14,7 +14,7 @@ interface InputFieldProps {
   required?: boolean;
 }
 
-// --- คอมโพเนนต์ย่อยสำหรับช่องป้อนข้อมูล (Input Field) ---
+// --- คอมโพเนนต์ย่อยสำหรับช่องป้อนข้อมูล - ปรับสไตล์ให้เหมือนหน้า Login ---
 const InputField = ({
   icon,
   type,
@@ -24,17 +24,18 @@ const InputField = ({
   required = true,
 }: InputFieldProps) => (
   <div className="relative mb-4">
-    {/* แสดง Icon ที่ถูกส่งเข้ามาเป็น Prop */}
-    <div className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500">
+    {/* แสดง Icon ที่ถูกส่งเข้ามาเป็น Prop - ปรับขนาดตามหน้าจอ */}
+    <div className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-500">
       {icon}
     </div>
+    {/* Input Field - ใช้ border-2 และปรับ padding ให้เหมาะกับมือถือ */}
     <input
       type={type}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
       required={required}
-      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out placeholder-gray-500 shadow-sm"
+      className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 border-2 border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out placeholder-gray-400 text-sm sm:text-base shadow-sm hover:border-gray-400"
     />
   </div>
 );
@@ -138,36 +139,37 @@ const PasswordResetForm = () => {
   const backgroundImageSource = imagePathFromPublic;
 
   return (
-    // คอนเทนเนอร์หลัก: จัดให้อยู่กึ่งกลางของหน้าจอ
+    // คอนเทนเนอร์หลัก: จัดให้อยู่กึ่งกลางของหน้าจอ - เพิ่ม padding สำหรับมือถือ
     <div
-      className="flex items-center justify-center min-h-screen p-4 sm:p-6 bg-cover bg-center"
+      className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8 bg-cover bg-center"
       style={{
         backgroundImage: `url(${backgroundImageSource})`,
         fontFamily: "Inter, sans-serif",
       }}
     >
-      {/* Overlay เพื่อให้ข้อความอ่านง่ายขึ้น */}
-      <div className="absolute inset-0 bg-black opacity-40"></div>
+      {/* Overlay เพื่อให้ข้อความอ่านง่ายขึ้น เพิ่มความเข้มเพื่อความคมชัดของตัวอักษร */}
+      <div className="absolute inset-0 bg-black opacity-50"></div>
 
-      {/* กล่องสีขาว: Card สำหรับแบบฟอร์ม */}
-      <div className="w-full max-w-md bg-white/60 backdrop-blur-md p-8 md:p-10 rounded-xl shadow-2xl border border-white/90 relative z-10">
-        {/* หัวข้อ: รีเซ็ตรหัสผ่าน */}
-        <h1 className="text-3xl font-extrabold text-gray-900 text-center mb-4">
-          รีเซ็ตรหัสผ่าน
-        </h1>
-
-        {/* คำอธิบาย */}
-        <p className="text-center text-gray-500 mb-6 text-sm">
-          กรุณากรอกอีเมลที่คุณใช้ลงทะเบียนเพื่อรับOTPสำหรับตั้งรหัสผ่านใหม่
-        </p>
+      {/* กล่องสีขาว Card สำหรับแบบฟอร์ม */}
+      <div className="w-full max-w-md relative z-10 px-2 sm:px-0">
+        <div className="bg-white/60 backdrop-blur-lg p-6 sm:p-8 md:p-10 rounded-2xl shadow-2xl border-2 border-white/30 transform transition duration-500 hover:shadow-blue-600/30">
+        {/* หัวข้อและคำบรรยาย */}
+        <div className="text-center mb-6 sm:mb-8 space-y-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
+            รีเซ็ตรหัสผ่าน
+          </h1>
+          <p className="mt-2 text-xs sm:text-sm text-gray-600 font-medium px-2 leading-relaxed">
+            กรุณากรอกอีเมลที่คุณใช้ลงทะเบียนเพื่อรับ OTP สำหรับตั้งรหัสผ่านใหม่
+          </p>
+        </div>
 
         {/* แสดงข้อความสถานะ/แจ้งเตือน */}
         {message && (
           <div
-            className={`p-3 mb-4 rounded-lg text-sm font-medium ${
+            className={`p-3 mb-4 rounded-lg text-xs sm:text-sm font-semibold ${
               isError
-                ? "bg-red-100 text-red-700"
-                : "bg-green-100 text-green-700"
+                ? "bg-red-100 text-red-700 border border-red-300"
+                : "bg-green-100 text-green-700 border border-green-300"
             }`}
           >
             {message}
@@ -175,48 +177,54 @@ const PasswordResetForm = () => {
         )}
         {/* แสดงคำเตือนหากยังไม่ได้ตั้งค่า Supabase */}
         {!supabase && !message && (
-          <div className="p-3 mb-4 rounded-lg text-sm font-medium bg-yellow-100 text-yellow-800">
+          <div className="p-3 mb-4 rounded-lg text-xs sm:text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300">
             <strong>คำเตือน:</strong> ฟอร์มนี้ยังไม่ได้เชื่อมต่อกับ Supabase
-            กรุณาตั้งค่า <code>supabaseUrl</code> และ{" "}
-            <code>supabaseAnonKey</code> ในโค้ด
+            กรุณาตั้งค่า <code className="font-mono">supabaseUrl</code> และ{" "}
+            <code className="font-mono">supabaseAnonKey</code> ในโค้ด
           </div>
         )}
 
         {/* แบบฟอร์มรีเซ็ต */}
-        <form onSubmit={handleResetPassword}>
+        <form onSubmit={handleResetPassword} className="space-y-4">
           {/* ช่องป้อนอีเมล */}
-          <InputField
-            icon={MailIcon} // ส่ง Inline SVG เข้าไปแทน
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="อีเมล (Email)"
-          />
+          <div>
+            <label htmlFor="email-input" className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2">
+              อีเมล
+            </label>
+            <InputField
+              icon={MailIcon}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@mail.com"
+            />
+          </div>
 
           {/* ปุ่มส่งคำขอรีเซ็ต */}
           <button
             type="submit"
-            // ปุ่มจะใช้งานได้เมื่อมีอีเมลถูกป้อน
             disabled={!email || isLoading || !supabase}
-            className={`w-full py-3 rounded-lg text-white font-semibold shadow-lg transition duration-300 ease-in-out mt-2 ${
+            className={`w-full py-3 sm:py-3.5 rounded-xl font-bold shadow-lg transition-all duration-300 ease-in-out text-base sm:text-lg mt-6 ${
               !email || isLoading || !supabase
-                ? "bg-indigo-300 cursor-not-allowed" // สไตล์เมื่อปุ่มถูกปิดใช้งาน
-                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transform hover:scale-[1.01] cursor-pointer" // สไตล์เมื่อปุ่มพร้อมใช้งาน
+                ? "bg-blue-300 text-white cursor-not-allowed opacity-50"
+                : "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-blue-600/40 hover:shadow-blue-600/60 hover:from-blue-700 hover:to-blue-800 transform hover:scale-[1.02] cursor-pointer active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             }`}
           >
             {isLoading ? "กำลังส่ง..." : "ส่งรหัส OTP"}
           </button>
         </form>
 
-        {/* ส่วนท้ายกล่อง: กลับไปหน้าเข้าสู่ระบบ */}
-        <div className="mt-6 text-center text-sm text-gray-500">
+        {/* ส่วนท้ายกล่อง กลับไปหน้าเข้าสู่ระบบ */}
+        <div className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-gray-700 font-medium">
           <a
             href="#"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
+            className="font-bold text-blue-600 hover:text-blue-800 transition duration-200 underline-offset-2 hover:underline inline-flex items-center gap-1"
             onClick={handleGoRegister}
           >
-            ← กลับไปหน้าเข้าสู่ระบบ
+            <span>←</span>
+            <span>กลับไปหน้าเข้าสู่ระบบ</span>
           </a>
+        </div>
         </div>
       </div>
     </div>

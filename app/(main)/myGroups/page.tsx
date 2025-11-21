@@ -59,9 +59,14 @@ export default function MyGroupsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-10 flex flex-col items-center">
-      <h1 className="text-4xl font-bold mb-8 text-center text-sky-700">
-        กลุ่มของฉัน
-      </h1>
+      <div className="bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl p-8 shadow-lg mb-8 w-full max-w-6xl">
+        <h1 className="text-4xl font-extrabold text-white tracking-tight text-center">
+          🏠 กลุ่มของฉัน
+        </h1>
+        <p className="text-sky-100 mt-2 text-sm text-center">
+          จัดการและดูแลกลุ่มที่คุณเป็นเจ้าของ
+        </p>
+      </div>
 
       {loading && <p className="text-center text-gray-500">กำลังโหลด...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
