@@ -32,6 +32,8 @@ export const NavbarSub = () => {
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const [userId, setUserId] = useState<string | null>(null);
   const pathname = usePathname();
+  // สถานะเปิด/ปิดแสดงกลุ่ม
+  const [isGroupsVisible, setIsGroupsVisible] = useState(true);
 
   // ดึง userId ของ session
   useEffect(() => {
@@ -144,73 +146,99 @@ export const NavbarSub = () => {
   }, [groups, pathname, userId]);
 
   return (
-    <nav className="flex items-center justify-between px-6 py-3 h-16 fixed top-20 left-0 w-full shadow-md z-40 bg-white">
-      {/* ซ้าย: Links */}
-      <div className="flex items-center gap-2 shrink-0">
-        <Link
-          href="/groups"
-          className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-sky-600 transition-colors whitespace-nowrap"
-        >
-          กลุ่มทั้งหมด
-        </Link>
-        <Link
-          href="/myGroups"
-          className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-sky-600 transition-colors whitespace-nowrap"
-        >
-          กลุ่มของฉัน
-        </Link>
+    <nav className="fixed top-20 left-0 w-full shadow-md z-40 bg-white">
+      {/* บรรทัดแรก: Links และปุ่มสร้างกลุ่ม */}
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3 h-16 gap-2">
+        {/* ซ้าย: Links */}
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <Link
+            href="/groups"
+            className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-600 hover:text-sky-600 transition-colors whitespace-nowrap border-2 border-gray-300 rounded-lg hover:border-sky-600"
+          >
+            กลุ่มทั้งหมด
+          </Link>
+          <Link
+            href="/myGroups"
+            className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-600 hover:text-sky-600 transition-colors whitespace-nowrap border-2 border-gray-300 rounded-lg hover:border-sky-600"
+          >
+            กลุ่มของฉัน
+          </Link>
+        </div>
+
+        {/* กลาง: ปุ่มเปิด/ปิดแสดงกลุ่ม */}
+        <div className="flex justify-center">
+          <button
+            onClick={() => setIsGroupsVisible(!isGroupsVisible)}
+            className="px-3 sm:px-4 py-1 text-xs sm:text-sm font-medium text-gray-600 hover:text-sky-600 transition-colors cursor-pointer whitespace-nowrap"
+          >
+            {isGroupsVisible ? "ซ่อนกลุ่ม ▲" : "แสดงกลุ่ม ▼"}
+          </button>
+        </div>
+
+        {/* ขวา: Create button */}
+        <div className="shrink-0">
+          <Link
+            href="/create"
+            className="flex items-center gap-1 sm:gap-2 rounded-full bg-sky-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white transition-all hover:bg-sky-700 hover:scale-105 active:scale-95 shadow-md whitespace-nowrap"
+          >
+            สร้างกลุ่ม
+          </Link>
+        </div>
       </div>
 
-      {/* กลาง: Avatar scroll */}
-      <div className="flex-1 flex gap-2 px-4 overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth">
-        {groups.map((group) => {
-          const count = unreadCounts[group.id] || 0;
-          return (
-            <div key={group.id} className="relative shrink-0">
-              <Link
-                href={`/groups/${group.id}`}
-                className="relative"
-                title={group.name}
-                onClick={() => markGroupAsRead(group.id)}
-              >
-                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 shadow-md hover:scale-105 transition-transform bg-gray-300 flex items-center justify-center">
-                  {group.avatar_url ? (
-                    <Image
-                      src={
-                        supabase.storage
-                          .from("groups")
-                          .getPublicUrl(group.avatar_url).data.publicUrl
-                      }
-                      alt={group.name}
-                      width={40}
-                      height={40}
-                      className="object-cover w-full h-full"
-                    />
-                  ) : (
-                    <UsersRound className="w-5 h-5 text-gray-600" />
+      {/* บรรทัดที่สอง: แสดงรายการกลุ่มแบบเลื่อนได้ */}
+      <div
+        className={`
+          overflow-hidden transition-all duration-300 ease-in-out border-t border-gray-200
+          ${isGroupsVisible ? "max-h-20 opacity-100" : "max-h-0 opacity-0"}
+        `}
+      >
+        <div className="flex gap-2 px-6 py-3 overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth">
+          {groups.length === 0 ? (
+            <div className="w-full flex items-center justify-center text-xs sm:text-sm text-gray-500">
+              ยังไม่มีกลุ่มที่คุณติดตาม
+            </div>
+          ) : (
+            groups.map((group) => {
+              const count = unreadCounts[group.id] || 0;
+              return (
+                <div key={group.id} className="relative shrink-0">
+                  <Link
+                    href={`/groups/${group.id}`}
+                    className="relative"
+                    title={group.name}
+                    onClick={() => markGroupAsRead(group.id)}
+                  >
+                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 shadow-md hover:scale-105 transition-transform bg-gray-300 flex items-center justify-center">
+                      {group.avatar_url ? (
+                        <Image
+                          src={
+                            supabase.storage
+                              .from("groups")
+                              .getPublicUrl(group.avatar_url).data.publicUrl
+                          }
+                          alt={group.name}
+                          width={40}
+                          height={40}
+                          className="object-cover w-full h-full"
+                        />
+                      ) : (
+                        <UsersRound className="w-5 h-5 text-gray-600" />
+                      )}
+                    </div>
+                  </Link>
+
+                  {/* ป้ายจำนวนโพสต์ที่ยังไม่ได้อ่าน */}
+                  {count > 0 && (
+                    <span className="absolute top-0 right-0 translate-x-1/2 bg-red-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full z-10 pointer-events-none">
+                      {count > 99 ? "99+" : count}
+                    </span>
                   )}
                 </div>
-              </Link>
-
-              {/* BADGE DISPLAY */}
-              {count > 0 && (
-                <span className="absolute top-0 right-0 translate-x-1/2 bg-red-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full z-10 pointer-events-none">
-                  {count > 99 ? "99+" : count}
-                </span>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* ขวา: Create button */}
-      <div className="shrink-0">
-        <Link
-          href="/create"
-          className="flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-sky-700 hover:scale-105 active:scale-95 shadow-md"
-        >
-          สร้างกลุ่ม
-        </Link>
+              );
+            })
+          )}
+        </div>
       </div>
     </nav>
   );

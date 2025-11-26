@@ -46,7 +46,7 @@ export default function Page() {
         {/* ส่วนเพิ่มเติม */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12 w-full px-4">
           {/* คุณสมบัติ 1 */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 shadow-lg hover:bg-white/15 transition-all duration-300">
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 shadow-lg transition-all duration-300">
             <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">📰</div>
             <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
               ติดตามข่าวสาร
@@ -57,7 +57,7 @@ export default function Page() {
           </div>
 
           {/* คุณสมบัติ 2 */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 shadow-lg hover:bg-white/15 transition-all duration-300">
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 shadow-lg transition-all duration-300">
             <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">💬</div>
             <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
               แบ่งปันประสบการณ์
@@ -68,7 +68,7 @@ export default function Page() {
           </div>
 
           {/* คุณสมบัติ 3 */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 shadow-lg hover:bg-white/15 transition-all duration-300">
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20 shadow-lg transition-all duration-300">
             <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">👥</div>
             <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
               สร้างกลุ่มของคุณ
