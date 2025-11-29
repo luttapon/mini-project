@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 import { PlusCircle, UsersRound } from 'lucide-react'
 
+// --- กำหนดโครงสร้างข้อมูลกลุ่ม (Interface) ---
 interface Group {
   id: string
   name: string
@@ -15,15 +16,19 @@ interface Group {
 }
 
 export default function MyGroupsPage() {
+  // --- State: จัดการข้อมูลและสถานะ ---
   const [groups, setGroups] = useState<Group[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [userId, setUserId] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null) // ID ผู้ใช้ปัจจุบัน
 
+  // --- Effect: โหลดข้อมูลเมื่อเข้าสู่หน้าเว็บ ---
   useEffect(() => {
     const fetchUserAndGroups = async () => {
       setLoading(true)
       setError('')
+      
+      // 1. ตรวจสอบข้อมูลผู้ใช้ปัจจุบัน (Auth)
       const {
         data: { user },
       } = await supabase.auth.getUser()
@@ -36,29 +41,34 @@ export default function MyGroupsPage() {
 
       setUserId(user.id)
 
+      // 2. ดึงข้อมูลกลุ่มที่ผู้ใช้นี้เป็นเจ้าของ (owner_id = user.id)
       const { data, error } = await supabase
         .from('groups')
         .select('*')
-        .eq('owner_id', user.id)
+        .eq('owner_id', user.id) // กรองเฉพาะกลุ่มที่ฉันเป็นเจ้าของ
 
       if (error) {
         console.error('Error fetching my groups:', error.message)
         setError('เกิดข้อผิดพลาดในการโหลดกลุ่มของฉัน')
       } else {
-        setGroups(data)
+        setGroups((data as Group[]) || [])
       }
 
       setLoading(false)
     }
 
     fetchUserAndGroups()
-  }, [])
+  }, []) // ทำงานเมื่อ Component Mount ครั้งเดียว
 
+  // ตัวแปรสำหรับรูปภาพเริ่มต้น (Placeholder)
   const avatarPlaceholder = '/default-avatar.png'
   const coverPlaceholder = '/default-cover.png'
 
   return (
+    // --- Container หลัก ---
     <div className="min-h-screen bg-gray-50 p-10 flex flex-col items-center">
+      
+      {/* ส่วนหัว (Header) */}
       <div className="bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl p-8 shadow-lg mb-8 w-full max-w-6xl">
         <h1 className="text-4xl font-extrabold text-white tracking-tight text-center">
           🏠 กลุ่มของฉัน
@@ -68,11 +78,14 @@ export default function MyGroupsPage() {
         </p>
       </div>
 
+      {/* สถานะ Loading และ Error */}
       {loading && <p className="text-center text-gray-500">กำลังโหลด...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
 
+      {/* Grid แสดงรายการกลุ่ม */}
       <div className="flex flex-wrap justify-center gap-6 w-full max-w-6xl">
-        {/* ปุ่มสร้างกลุ่มใหม่ แบบเดิม */}
+        
+        {/* ปุ่มสร้างกลุ่มใหม่ (Create Card) */}
         <Link
           href="/create"
           className="w-52 h-60 rounded-2xl shadow-md flex flex-col items-center justify-center border-2 border-dashed border-sky-400 hover:border-sky-600 hover:scale-105 transform transition cursor-pointer bg-white"
@@ -83,44 +96,49 @@ export default function MyGroupsPage() {
           </span>
         </Link>
 
-        {/* Card กลุ่มของฉัน */}
-        {groups.map((group) => {
-          const avatarUrl = group.avatar_url
-            ? supabase.storage.from('groups').getPublicUrl(group.avatar_url).data.publicUrl
-            : avatarPlaceholder
-          const coverUrl = group.cover_url
-            ? supabase.storage.from('groups').getPublicUrl(group.cover_url).data.publicUrl
-            : coverPlaceholder
+        {/* วนลูปแสดงการ์ดกลุ่ม (Group Cards) */}
+        {!loading && groups.map((group) => {
+          // 1. เตรียม URL รูปภาพ Avatar
+          const { data: avatarData } = supabase.storage.from('groups').getPublicUrl(group.avatar_url || 'no-path');
+          const avatarUrl = group.avatar_url ? avatarData.publicUrl : avatarPlaceholder;
+
+          // 2. เตรียม URL รูปภาพ Cover
+          const { data: coverData } = supabase.storage.from('groups').getPublicUrl(group.cover_url || 'no-path');
+          const coverUrl = group.cover_url ? coverData.publicUrl : coverPlaceholder;
 
           return (
             <div
               key={group.id}
               className="w-52 h-60 rounded-2xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition relative"
               style={{
+                // ใช้ Cover URL สำหรับพื้นหลัง Card
                 backgroundImage: `url(${coverUrl})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}
             >
-                {/* Dark overlay */}
-                <div className="absolute inset-0 bg-black/40"></div>
-              {/* Avatar */}
+              {/* Overlay สีดำจางๆ เพื่อให้อ่านตัวหนังสือชัดขึ้น */}
+              <div className="absolute inset-0 bg-black/40"></div>
+              
+              {/* รูปโปรไฟล์กลุ่ม (Avatar) */}
               <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
                 {group.avatar_url ? (
+                  // แสดง Avatar ถ้ามี
                   <img src={avatarUrl} alt={group.name} className="w-full h-full object-cover" />
                 ) : (
+                  // แสดง Placeholder ถ้าไม่มี Avatar
                   <div className="w-full h-full bg-gray-300 flex items-center justify-center">
                     <UsersRound className="w-10 h-10 text-gray-600" />
                   </div>
                 )}
               </div>
 
-              {/* Name */}
+              {/* ชื่อกลุ่ม */}
               <h2 className="absolute bottom-16 w-full text-center text-white text-xl sm:text-2xl font-extrabold break-words line-clamp-2 p-2">
                 {group.name}
               </h2>
 
-              {/* Button */}
+              {/* ปุ่มดูรายละเอียด */}
               <Link
                 href={`/groups/${group.id}`}
                 className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-40 text-center bg-sky-600 text-white py-2 rounded-xl font-medium hover:bg-sky-700 transition"
@@ -132,7 +150,8 @@ export default function MyGroupsPage() {
         })}
       </div>
 
-      {!loading && groups.length === 0 && (
+      {/* ข้อความแจ้งเตือนเมื่อไม่มีกลุ่ม */}
+      {!loading && groups.length === 0 && !error && (
         <p className="text-center text-gray-400 mt-10 text-lg">
           คุณยังไม่มีกลุ่มในระบบ
         </p>

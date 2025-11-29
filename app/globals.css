@@ -1,11 +1,149 @@
 @import "tailwindcss";
 
-/* global.css */
+/* --- Utility Classes: จัดการ Scrollbar --- */
+/* ซ่อน Scrollbar แต่ยังเลื่อนได้ (สำหรับ Chrome, Safari) */
 .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
+/* ซ่อน Scrollbar (สำหรับ IE, Edge, Firefox) */
 .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE & Edge */
-    scrollbar-width: none;     /* Firefox */
-    
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* --- Animation Keyframes: การเคลื่อนไหวของคลื่น --- */
+
+/* ท่าที่ 1: ลอยไปทางซ้าย-ขวา พร้อมหมุน */
+@keyframes float-wave {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-20px, 20px) rotate(5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* ท่าที่ 2: ลอยในทิศทางตรงกันข้าม */
+@keyframes float-wave-reverse {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(20px, -20px) rotate(-5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* --- Wave Structure: โครงสร้างหลัก --- */
+
+/* Container หลัก: ครอบคลุมพื้นที่ทั้งหมดและจัดการ Layer */
+.wave-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%; 
+  overflow: hidden;
+  pointer-events: none; /* ป้องกันไม่ให้บังการคลิกปุ่มหรือเนื้อหา */
+  z-index: 0;
+}
+
+/* Base Style: รูปทรงพื้นฐานของคลื่น (รูปทรงอิสระ) */
+.wave-blob {
+  position: absolute;
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  filter: blur(10px); /* ความฟุ้งของขอบ */
+  opacity: 0.9;
+  mix-blend-mode: multiply; /* โหมดผสมสีให้ดูมีมิติ */
+}
+
+/* --- Main Waves: กลุ่มคลื่นขนาดใหญ่ (มุมขวาบน) --- */
+.wave-1 {
+  top: -40%;
+  right: -20%;
+  width: 700px;
+  height: 600px;
+  background: linear-gradient(135deg, #fde047 0%, #7dd3fc 100%);
+  animation: float-wave 10s ease-in-out infinite;
+  opacity: 1;
+}
+
+.wave-2 {
+  top: -30%;
+  right: -15%;
+  width: 600px;
+  height: 500px;
+  background: linear-gradient(135deg, #5eead4 0%, #3b82f6 100%);
+  animation: float-wave-reverse 12s ease-in-out infinite;
+  opacity: 1;
+}
+
+.wave-3 {
+  top: -30%;
+  right: -15%;
+  width: 500px;
+  height: 400px;
+  background: linear-gradient(135deg, #93c5fd 0%, #2563eb 100%);
+  animation: float-wave 8s ease-in-out infinite;
+  opacity: 1;
+}
+
+/* --- Small Waves: กลุ่มคลื่นเล็กกระจายตัว --- */
+
+/* มุมซ้ายบน */
+.wave-small-1 {
+  top: 10%;
+  left: 5%;
+  width: 200px;
+  height: 180px;
+  background: linear-gradient(135deg, #fef08a 0%, #bae6fd 100%);
+  animation: float-wave-reverse 15s ease-in-out infinite;
+  opacity: 1;
+}
+
+/* ตรงกลางซ้าย */
+.wave-small-2 {
+  top: 50%;
+  left: 5%;
+  width: 150px;
+  height: 220px;
+  background: linear-gradient(135deg, #99f6e4 0%, #60a5fa 100%);
+  animation: float-wave 18s ease-in-out infinite;
+  opacity: 1;
+}
+
+/* มุมซ้ายล่าง */
+.wave-small-3 {
+  bottom: 5%;
+  left: 30%;
+  width: 250px;
+  height: 200px;
+  background: linear-gradient(135deg, #5eead4 0%, #bfdbfe 100%);
+  animation: float-wave-reverse 20s ease-in-out infinite;
+  opacity: 1;
+}
+
+/* มุมขวาล่าง */
+.wave-small-4 {
+  bottom: 30%;
+  right: 10%;
+  width: 180px;
+  height: 180px;
+  background: linear-gradient(135deg, #93c5fd 0%, #2563eb 100%);
+  animation: float-wave 14s ease-in-out infinite;
+  opacity: 1;
+}
+
+/* --- Responsive Design: ปรับแต่งสำหรับมือถือ --- */
+@media (max-width: 640px) {
+  /* ทำให้คลื่นจางลงและเบลอมากขึ้นเพื่อไม่ให้อ่านยากบนจอเล็ก */
+  .wave-blob {
+    opacity: 0.25 !important;
+    filter: blur(28px);
+  }
+
+  /* ลดขนาดกลุ่มคลื่นใหญ่ */
+  .wave-1, .wave-2, .wave-3 {
+    transform: scale(0.6);
+  }
+
+  /* ลดขนาดกลุ่มคลื่นเล็ก */
+  .wave-small-1,
+  .wave-small-2,
+  .wave-small-3,
+  .wave-small-4 {
+    transform: scale(0.5);
+  }
 }

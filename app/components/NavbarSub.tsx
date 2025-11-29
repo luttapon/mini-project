@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -10,41 +9,43 @@ import { usePathname } from "next/navigation";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { UsersRound } from "lucide-react";
 
-// -------------------------------
-// Types
-// -------------------------------
+// --- กำหนดโครงสร้างข้อมูล (Types) ---
 interface Group {
   id: string;
   name: string;
   avatar_url: string | null;
   owner_id: string;
 }
+
 interface UserGroupReadStatus {
   group_id: string;
-  last_read_at: string; // timestampz
+  last_read_at: string; // Timestamp ของการอ่านล่าสุด
 }
 
-// -------------------------------
-// Component
-// -------------------------------
+// --- Component หลัก: แถบนำทางรอง (แสดงกลุ่มที่ติดตาม) ---
 export const NavbarSub = () => {
-  const { groups } = useFollowedGroups();
-  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
-  const [userId, setUserId] = useState<string | null>(null);
-  const pathname = usePathname();
-  // สถานะเปิด/ปิดแสดงกลุ่ม
-  const [isGroupsVisible, setIsGroupsVisible] = useState(true);
+  // --- Context & Hooks ---
+  const { groups } = useFollowedGroups(); // ดึงรายชื่อกลุ่มที่ติดตาม
+  const pathname = usePathname(); // ดึง URL ปัจจุบัน
 
-  // ดึง userId ของ session
+  // --- State Management ---
+  // เก็บจำนวนโพสต์ที่ยังไม่อ่าน: { groupId: count }
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({}); 
+  const [userId, setUserId] = useState<string | null>(null); // เก็บ ID ผู้ใช้
+  const [isGroupsVisible, setIsGroupsVisible] = useState(true); // สถานะเปิด/ปิดแถบแสดงกลุ่ม
+
+  // --- Effect: ดึง User ID เมื่อโหลด ---
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserId(session?.user?.id || null);
     });
-  }, []);
+  }, []); // ทำงานเมื่อ Mount ครั้งเดียว
 
+  // --- Logic: ทำเครื่องหมายว่าอ่านกลุ่มนี้แล้ว (เมื่อคลิกเข้ากลุ่ม) ---
   const markGroupAsRead = async (groupId: string) => {
     if (!userId) return;
 
+    // 1. อัปเดตเวลาอ่านล่าสุดลงฐานข้อมูล (Upsert)
     await supabase.from("user_group_read_status").upsert(
       [
         {
@@ -53,19 +54,22 @@ export const NavbarSub = () => {
           last_read_at: new Date().toISOString(),
         },
       ],
-      { onConflict: "user_id,group_id" }
+      { onConflict: "user_id,group_id" } // Conflict by unique pair (user_id, group_id)
     );
 
+    // 2. รีเซ็ตตัวเลขแจ้งเตือนใน State เป็น 0 ทันทีเพื่ออัปเดต UI
     setUnreadCounts((prev) => ({
       ...prev,
       [groupId]: 0,
     }));
   };
 
+  // --- Effect: คำนวณจำนวนโพสต์ที่ยังไม่อ่าน & ตั้งค่า Realtime Listener ---
   useEffect(() => {
     if (groups.length === 0 || !userId) return;
 
     const fetchUnreadCounts = async () => {
+      // 1. ดึงข้อมูลว่า User อ่านแต่ละกลุ่มไปถึงเวลาไหนแล้ว
       const { data: readStatusData } = (await supabase
         .from("user_group_read_status")
         .select("group_id, last_read_at")
@@ -77,15 +81,18 @@ export const NavbarSub = () => {
 
       const counts: Record<string, number> = {};
 
+      // 2. วนลูปแต่ละกลุ่มเพื่อรับจำนวนโพสต์ใหม่
       for (const group of groups) {
         const status = readStatusData?.find((s) => s.group_id === group.id);
         const lastReadTime = status?.last_read_at;
 
         let query = supabase
           .from("posts")
-          .select("id", { count: "exact", head: true })
-          .eq("group_id", group.id);
+          .select("id", { count: "exact", head: true }) // นับจำนวนอย่างเดียว
+          .eq("group_id", group.id)
+          .neq("user_id", userId); // ไม่นับโพสต์ที่สร้างโดยผู้ใช้ปัจจุบัน (Self-post)
 
+        // ถ้ายิ่งเคยอ่าน ให้หาโพสต์ที่ใหม่กว่าเวลาที่อ่านล่าสุด
         if (lastReadTime) query = query.gt("created_at", lastReadTime);
 
         const { count, error } = await query;
@@ -94,7 +101,7 @@ export const NavbarSub = () => {
           console.error(`Error fetching post count for ${group.id}:`, error);
           counts[group.id] = 0;
         } else {
-          // ถ้า path ปัจจุบันคือหน้ากลุ่มนั้น หรือเป็นเจ้าของกลุ่ม ให้เป็น 0
+          // เงื่อนไขพิเศษ: ถ้าเปิดหน้ากลุ่มนั้นอยู่ หรือเป็นเจ้าของกลุ่ม ไม่ต้องแสดง Badge
           if (pathname === `/groups/${group.id}` || group.owner_id === userId) {
             counts[group.id] = 0;
           } else {
@@ -108,8 +115,7 @@ export const NavbarSub = () => {
 
     fetchUnreadCounts();
 
-    // -------------------------------
-    // Realtime listener
+    // --- Realtime Listener: ฟัง event โพสต์ใหม่ ---
     const channel: RealtimeChannel = supabase
       .channel("group_unread_counter")
       .on(
@@ -118,13 +124,19 @@ export const NavbarSub = () => {
           event: "INSERT",
           schema: "public",
           table: "posts",
-          filter: `group_id=in.(${groups.map((g) => g.id).join(",")})`,
+          // ฟังเฉพาะกลุ่มที่ติดตามเท่านั้น
+          filter: `group_id=in.(${groups.map((g) => g.id).join(",")})`, 
         },
         (payload) => {
-          const groupId = (payload.new as { group_id: string }).group_id;
+          // Cast payload.new เพื่อให้มี user_id
+          const newPost = payload.new as { group_id: string; user_id: string }; 
+          const groupId = newPost.group_id;
           const group = groups.find((g) => g.id === groupId);
 
-          // ถ้าเราอยู่หน้ากลุ่มนั้น หรือเป็นเจ้าของกลุ่ม ไม่เพิ่ม badge
+          // 1. ถ้าโพสต์ถูกสร้างโดยผู้ใช้ปัจจุบัน ให้ข้าม (ไม่บวกแจ้งเตือน)
+          if (newPost.user_id === userId) return; 
+
+          // 2. เงื่อนไขที่มีอยู่: ถ้าเปิดหน้านั้นอยู่ หรือเป็นเจ้าของกลุ่ม ไม่ต้องบวกเพิ่ม
           if (
             !group ||
             pathname === `/groups/${groupId}` ||
@@ -132,6 +144,7 @@ export const NavbarSub = () => {
           )
             return;
 
+          // 3. บวกจำนวนแจ้งเตือนเพิ่ม +1
           setUnreadCounts((prev) => ({
             ...prev,
             [groupId]: (prev[groupId] || 0) + 1,
@@ -141,105 +154,159 @@ export const NavbarSub = () => {
       .subscribe();
 
     return () => {
+      // Cleanup: ลบ Channel เมื่อ Component ถูกทำลาย
       supabase.removeChannel(channel);
     };
-  }, [groups, pathname, userId]);
+  }, [groups, pathname, userId]); // Dependency: กลุ่ม, Path, และ User ID
 
   return (
-    <nav className="fixed top-20 left-0 w-full shadow-md z-40 bg-white">
-      {/* บรรทัดแรก: Links และปุ่มสร้างกลุ่ม */}
-      <div className="flex items-center justify-between px-4 sm:px-6 py-3 h-16 gap-2">
-        {/* ซ้าย: Links */}
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-          <Link
-            href="/groups"
-            className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-600 hover:text-sky-600 transition-colors whitespace-nowrap border-2 border-gray-300 rounded-lg hover:border-sky-600"
-          >
-            กลุ่มทั้งหมด
-          </Link>
-          <Link
-            href="/myGroups"
-            className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-600 hover:text-sky-600 transition-colors whitespace-nowrap border-2 border-gray-300 rounded-lg hover:border-sky-600"
-          >
-            กลุ่มของฉัน
-          </Link>
-        </div>
+  // --- Container หลัก: แถบนำทางรอง (Fixed Position ใต้ Navbar หลัก) ---
+  <nav className="
+      fixed top-20 left-0 w-full z-40
+      bg-white/80 backdrop-blur-md
+      shadow-[0_4px_10px_rgba(0,0,0,0.06)]
+      border-b border-slate-200
+    "
+  >
 
-        {/* กลาง: ปุ่มเปิด/ปิดแสดงกลุ่ม */}
-        <div className="flex justify-center">
-          <button
-            onClick={() => setIsGroupsVisible(!isGroupsVisible)}
-            className="px-3 sm:px-4 py-1 text-xs sm:text-sm font-medium text-gray-600 hover:text-sky-600 transition-colors cursor-pointer whitespace-nowrap"
-          >
-            {isGroupsVisible ? "ซ่อนกลุ่ม ▲" : "แสดงกลุ่ม ▼"}
-          </button>
-        </div>
+    {/* ---------------- TOP BAR (ปุ่มนำทางหลัก) ---------------- */}
+    <div className="flex items-center justify-between px-4 sm:px-6 py-3 h-16 gap-2">
 
-        {/* ขวา: Create button */}
-        <div className="shrink-0">
-          <Link
-            href="/create"
-            className="flex items-center gap-1 sm:gap-2 rounded-full bg-sky-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white transition-all hover:bg-sky-700 hover:scale-105 active:scale-95 shadow-md whitespace-nowrap"
-          >
-            สร้างกลุ่ม
-          </Link>
-        </div>
+      {/* Left buttons */}
+      <div className="flex items-center gap-2 shrink-0">
+        <Link
+          href="/groups"
+          className="
+            border border-slate-300 hover:border-sky-500
+            px-3 py-1.5 rounded-xl transition-all
+            text-xs sm:text-sm text-slate-600 hover:text-sky-600
+            hover:shadow-sm active:scale-95
+          "
+        >
+          กลุ่มทั้งหมด
+        </Link>
+
+        <Link
+          href="/myGroups"
+          className="
+            border border-slate-300 hover:border-sky-500
+            px-3 py-1.5 rounded-xl transition-all
+            text-xs sm:text-sm text-slate-600 hover:text-sky-600
+            hover:shadow-sm active:scale-95
+          "
+        >
+          กลุ่มของฉัน
+        </Link>
       </div>
 
-      {/* บรรทัดที่สอง: แสดงรายการกลุ่มแบบเลื่อนได้ */}
-      <div
-        className={`
-          overflow-hidden transition-all duration-300 ease-in-out border-t border-gray-200
-          ${isGroupsVisible ? "max-h-20 opacity-100" : "max-h-0 opacity-0"}
-        `}
-      >
-        <div className="flex gap-2 px-6 py-3 overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth">
-          {groups.length === 0 ? (
-            <div className="w-full flex items-center justify-center text-xs sm:text-sm text-gray-500">
-              ยังไม่มีกลุ่มที่คุณติดตาม
-            </div>
-          ) : (
-            groups.map((group) => {
-              const count = unreadCounts[group.id] || 0;
-              return (
-                <div key={group.id} className="relative shrink-0">
-                  <Link
-                    href={`/groups/${group.id}`}
-                    className="relative"
-                    title={group.name}
-                    onClick={() => markGroupAsRead(group.id)}
+      {/* Toggle */}
+      <div className="flex justify-center">
+        <button
+          onClick={() => setIsGroupsVisible(!isGroupsVisible)}
+          className="
+            text-xs sm:text-sm text-slate-600
+            hover:text-sky-600 transition-all
+            px-3 py-1 rounded-lg
+            hover:bg-sky-50 active:scale-95
+          "
+        >
+          {isGroupsVisible ? "ซ่อนกลุ่ม ▲" : "แสดงกลุ่ม ▼"}
+        </button>
+      </div>
+
+      {/* Create button */}
+      <div className="shrink-0">
+        <Link
+          href="/create"
+          className="
+            bg-gradient-to-r from-sky-500 to-sky-600
+            px-4 py-2 rounded-full text-white
+            text-xs sm:text-sm font-medium shadow-sm
+            hover:shadow-md hover:scale-105
+            active:scale-95 transition-all
+          "
+        >
+          สร้างกลุ่ม
+        </Link>
+      </div>
+
+    </div>
+
+    {/* --------------- GROUP BAR (แถบแสดงกลุ่มที่ติดตาม) ---------------- */}
+    <div
+      className={`
+        overflow-hidden transition-all duration-500 ease-in-out 
+        border-t border-slate-200 bg-white/60 backdrop-blur-sm
+        ${isGroupsVisible ? "max-h-24 opacity-100" : "max-h-0 opacity-0"}
+      `}
+    >
+      <div className="flex gap-3 px-6 py-3 overflow-x-auto scrollbar-hide scroll-smooth">
+
+        {groups.length === 0 ? (
+          // กรณีไม่มีกลุ่มที่ติดตาม
+          <div className="text-xs sm:text-sm text-slate-500 w-full text-center py-2">
+            ยังไม่มีกลุ่มที่คุณติดตาม
+          </div>
+        ) : (
+          // วนลูปแสดงกลุ่มที่ติดตาม
+          groups.map((group) => {
+            const count = unreadCounts[group.id] || 0;
+            return (
+              <div key={group.id} className="relative shrink-0">
+                <Link
+                  href={`/groups/${group.id}`}
+                  // เมื่อคลิก ให้ทำเครื่องหมายว่าอ่านแล้ว
+                  onClick={() => markGroupAsRead(group.id)}
+                  className="block"
+                >
+                  {/* Avatar Bubble */}
+                  <div className="
+                      w-11 h-11 rounded-2xl overflow-hidden 
+                      bg-gradient-to-br from-slate-100 to-slate-200
+                      shadow-md border border-white
+                      hover:scale-110 transition-transform duration-200
+                      flex items-center justify-center
+                    "
                   >
-                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 shadow-md hover:scale-105 transition-transform bg-gray-300 flex items-center justify-center">
-                      {group.avatar_url ? (
-                        <Image
-                          src={
-                            supabase.storage
-                              .from("groups")
-                              .getPublicUrl(group.avatar_url).data.publicUrl
-                          }
-                          alt={group.name}
-                          width={40}
-                          height={40}
-                          className="object-cover w-full h-full"
-                        />
-                      ) : (
-                        <UsersRound className="w-5 h-5 text-gray-600" />
-                      )}
-                    </div>
-                  </Link>
+                    {group.avatar_url ? (
+                      // แสดงรูป Avatar กลุ่ม
+                      <Image
+                        src={
+                          supabase.storage
+                            .from("groups")
+                            .getPublicUrl(group.avatar_url).data.publicUrl
+                        }
+                        alt={group.name}
+                        width={44}
+                        height={44}
+                        className="object-cover w-full h-full"
+                        unoptimized
+                      />
+                    ) : (
+                      // Placeholder Icon
+                      <UsersRound className="w-5 h-5 text-slate-600" />
+                    )}
+                  </div>
+                </Link>
 
-                  {/* ป้ายจำนวนโพสต์ที่ยังไม่ได้อ่าน */}
-                  {count > 0 && (
-                    <span className="absolute top-0 right-0 translate-x-1/2 bg-red-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full z-10 pointer-events-none">
-                      {count > 99 ? "99+" : count}
-                    </span>
-                  )}
-                </div>
-              );
-            })
-          )}
-        </div>
+                {/* Badge แสดงจำนวนที่ยังไม่อ่าน */}
+                {count > 0 && (
+                  <span className="
+                      absolute top-0 right-0 translate-x-1/2
+                      bg-red-600 text-white text-[10px] font-bold
+                      w-5 h-5 flex items-center justify-center rounded-full
+                      shadow-md
+                    "
+                  >
+                    {count > 99 ? "99+" : count}
+                  </span>
+                )}
+              </div>
+            );
+          })
+        )}
       </div>
-    </nav>
-  );
+    </div>
+  </nav>
+);
 };
