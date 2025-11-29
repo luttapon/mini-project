@@ -78,10 +78,10 @@ export default function GroupsPage() {
           return (
             <div
               key={group.id}
-              className="w-52 h-60 rounded-2xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition relative"
+              className="w-52 h-60 rounded-2xl shadow-md overflow-hidden cursor-pointer transform hover:scale-105 transition relative bg-gray-200"
               style={{
-                // ใช้ Cover URL สำหรับพื้นหลัง Card
-                backgroundImage: `url(${coverUrl})`,
+                // 🛠️ แก้ไข: ใส่ quote ครอบ URL กันพังกรณีมีเว้นวรรค
+                backgroundImage: `url('${coverUrl}')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}
@@ -93,7 +93,12 @@ export default function GroupsPage() {
               <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg aspect-square shrink-0 bg-white">
                 {group.avatar_url ? (
                   // แสดง Avatar ถ้ามี
-                  <img src={avatarUrl} alt={group.name} className="w-full h-full object-cover" />
+                  <img 
+                    src={avatarUrl} 
+                    alt={group.name} 
+                    className="w-full h-full object-cover" 
+                    onError={(e) => { e.currentTarget.src = avatarPlaceholder; }}
+                  />
                 ) : (
                   // แสดง Placeholder Icon
                   <div className="w-full h-full bg-gray-300 flex items-center justify-center">
@@ -103,14 +108,14 @@ export default function GroupsPage() {
               </div>
 
               {/* ชื่อกลุ่ม */}
-              <h2 className="absolute bottom-16 w-full text-center text-white text-xl sm:text-2xl font-extrabold break-words line-clamp-2 p-2">
+              <h2 className="absolute bottom-16 w-full text-center text-white text-xl sm:text-2xl font-extrabold break-words line-clamp-2 p-2 drop-shadow-md">
                 {group.name}
               </h2>
 
               {/* ปุ่มดูรายละเอียด */}
               <Link
                 href={`/groups/${group.id}`}
-                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-40 text-center bg-sky-600 text-white py-2 rounded-xl font-medium hover:bg-sky-700 transition"
+                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-40 text-center bg-sky-600 text-white py-2 rounded-xl font-medium hover:bg-sky-700 transition shadow-lg"
               >
                 ดูรายละเอียด
               </Link>
