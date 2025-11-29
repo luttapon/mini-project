@@ -261,7 +261,7 @@ export const NavbarSub = () => {
                 >
                   {/* Avatar Bubble */}
                   <div className="
-                      w-11 h-11 rounded-2xl overflow-hidden 
+                      w-11 h-11 rounded-full overflow-hidden 
                       bg-gradient-to-br from-slate-100 to-slate-200
                       shadow-md border border-white
                       hover:scale-110 transition-transform duration-200
